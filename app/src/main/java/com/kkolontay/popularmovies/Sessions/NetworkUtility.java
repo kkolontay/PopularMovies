@@ -34,6 +34,10 @@ public class NetworkUtility {
     public static String getResponseFromHttpUrl(URL url) throws Exception { // IOExeption
 
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        if(urlConnection.getResponseCode() > 299) {
+            String message = urlConnection.getResponseMessage();
+            Log.v(TAG, message);
+        }
         InputStream in = urlConnection.getErrorStream();
         if (in == null) {
             in = urlConnection.getInputStream();
