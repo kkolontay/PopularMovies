@@ -3,6 +3,7 @@ package com.kkolontay.popularmovies.DataModel;
 import java.util.ArrayList;
 
 public class ResponseDataObject {
+
     public final static String PAGE = "page";
     public final static String TOTALRESULTS = "total_results";
     public final static String TOTALPAGES = "total_pages";
@@ -11,6 +12,11 @@ public class ResponseDataObject {
     private int _total_resuts;
     private int _total_pages;
     private ArrayList<PopularMovie> results;
+
+    public ResponseDataObject() {
+        _page = 0;
+        _total_pages = 1;
+    }
 
     public int get_page() {
         return _page;
@@ -41,6 +47,8 @@ public class ResponseDataObject {
     }
 
     public void setResults(ArrayList<PopularMovie> results) {
-        this.results.addAll(results);
+        if (this.results != null && results != null) {
+            this.results.addAll(results);
+        }
     }
 }

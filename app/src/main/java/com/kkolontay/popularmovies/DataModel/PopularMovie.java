@@ -1,6 +1,9 @@
 package com.kkolontay.popularmovies.DataModel;
 
-public class PopularMovie {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class PopularMovie implements Parcelable {
     public final static String VOTECOUNT = "vote_count";
     public final static String ID = "id";
     public final static String VIDEO = "video";
@@ -123,5 +126,52 @@ public class PopularMovie {
         this._release_date = _release_date;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(_vote_count);
+        dest.writeInt(_id);
+        dest.writeInt(_video? 1: 0);
+        dest.writeDouble(_vote_average);
+        dest.writeString(_title);
+        dest.writeDouble(_popularity);
+        dest.writeString(_poster_path);
+        dest.writeString(_original_title);
+        dest.writeInt(_genre_ids.length);
+        dest.writeIntArray(_genre_ids);
+        dest.writeString(_backdrop_path);
+        dest.writeString(_overview);
+        dest.writeString(_release_date);
+    }
+    public static final Parcelable.Creator<PopularMovie> CREATOR
+            = new Parcelable.Creator<PopularMovie>() {
+        public PopularMovie createFromParcel(Parcel in) {
+            return new PopularMovie(in);
+        }
+
+        public PopularMovie[] newArray(int size) {
+            return new PopularMovie[size];
+        }
+    };
+
+    private PopularMovie(Parcel in) {
+        _vote_count = in.readInt();
+         _id = in.readInt();
+        _video = (in.readInt() == 1? true: false);
+        _vote_average = in.readDouble();
+        _title = in.readString();
+        _popularity = in.readDouble();
+        _poster_path = in.readString();
+        _original_title = in.readString();
+        int length = in.readInt();
+        _genre_ids = new int[length];
+         in.readIntArray(_genre_ids);
+        _backdrop_path = in.readString();
+        _overview = in.readString();
+        _release_date = in.readString();
+    }
 }
