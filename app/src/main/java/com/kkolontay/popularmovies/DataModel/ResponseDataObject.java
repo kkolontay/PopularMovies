@@ -16,6 +16,7 @@ public class ResponseDataObject {
     public ResponseDataObject() {
         _page = 0;
         _total_pages = 1;
+        results = new ArrayList<>();
     }
 
     public int get_page() {

@@ -147,6 +147,7 @@ public class PopularMovie implements Parcelable {
         dest.writeString(_overview);
         dest.writeString(_release_date);
     }
+    public PopularMovie() {}
     public static final Parcelable.Creator<PopularMovie> CREATOR
             = new Parcelable.Creator<PopularMovie>() {
         public PopularMovie createFromParcel(Parcel in) {

@@ -8,6 +8,7 @@ import com.kkolontay.popularmovies.DataManager.DataManager;
 import com.kkolontay.popularmovies.DataModel.ResponseDataObject;
 import com.kkolontay.popularmovies.Sessions.NetworkUtility;
 import com.kkolontay.popularmovies.Sessions.RequestMovieError;
+import com.kkolontay.popularmovies.Sessions.TypeRequest;
 import com.kkolontay.popularmovies.Utility.ObjectsDataJSONParser;
 import java.lang.ref.WeakReference;
 import java.net.URL;
@@ -31,7 +32,7 @@ public class MainActivityViewModel {
         nextPage = nextPage + 1;
         URL url = null;
         if (nextPage <= dataManager.get_response().get_total_pages()) {
-            url = NetworkUtility.buildURL(nextPage, NetworkUtility.TypeRequest.POPULAR);
+            url = NetworkUtility.buildURL(nextPage, TypeRequest.POPULAR);
             if (url != null) {
                 new FetchMoviesList().execute(url);
             }

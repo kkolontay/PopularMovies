@@ -30,6 +30,10 @@ public final class NetworkUtility {
     private static final String PAGE_REQUEST_KEY = "page";
     private static final String API_REQUEST_KEY = "api_key";
     private static final String TAG = NetworkUtility.class.getSimpleName();
+    private static final String IMAGE_HOST = "https://image.tmdb.org/t/p/";
+    private static final String BIG_SIZE_IMAGE = "w780";
+    private static final String SMALL_SIZE_IMAGE = "w185";
+    private static final String MIDDLE_SIZE_IMAGE = "w500";
 
     public static String getResponseFromHttpUrl(URL url) throws Exception { // IOExeption
 
@@ -97,8 +101,22 @@ public final class NetworkUtility {
         return url;
     }
 
-
-    public enum TypeRequest {
-        POPULAR, RATED
+    public static String getImageURLString(String imagePath, SizeImage size) {
+        String sizeImage;
+        switch (size) {
+            case BIG:
+                sizeImage = NetworkUtility.BIG_SIZE_IMAGE;
+                break;
+            case MIDDLE:
+                sizeImage = NetworkUtility.MIDDLE_SIZE_IMAGE;
+                break;
+                default:
+                    sizeImage = NetworkUtility.SMALL_SIZE_IMAGE;
+        }
+        return NetworkUtility.IMAGE_HOST + sizeImage + imagePath;
     }
+
+
+
 }
+
