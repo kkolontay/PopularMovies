@@ -1,27 +1,36 @@
-package com.kkolontay.popularmovies;
+package com.kkolontay.popularmovies.View;
 
 import android.app.Dialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.os.PersistableBundle;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.kkolontay.popularmovies.ConnectionState;
+import com.kkolontay.popularmovies.DataManager.DataManager;
 import com.kkolontay.popularmovies.DataModel.PopularMovie;
+import com.kkolontay.popularmovies.R;
+import com.kkolontay.popularmovies.Sessions.TypeRequest;
+import com.kkolontay.popularmovies.View.Pagination.PaginationScrollListener;
 import com.kkolontay.popularmovies.ViewModel.MainActivityInterface;
 import com.kkolontay.popularmovies.ViewModel.MainActivityViewModel;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public final class MainActivity extends AppCompatActivity implements MainActivityInterface {
+public final class MainActivity extends AppCompatActivity implements MainActivityInterface, PaginationScrollListener.OnLoadMoreListener {
     final String SAVEINSTANCE = "POPULAR_MOVIES";
     public static String TAG = MainActivity.class.getSimpleName();
     private Dialog dialog;
@@ -30,8 +39,9 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
     private MainActivityViewModel viewModel;
     private RecyclerView recyclerView;
     private final int COUNT_COLUMN = 3;
-    private MainViewRecyclerView mainRecyclerView;
+    private MainViewRecyclerView mAdapter;
     private ProgressBar progressBar;
+    private PaginationScrollListener paginationScrollListener;
 
 
     @Override
@@ -39,27 +49,26 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         recyclerView = (RecyclerView) findViewById(R.id.main_recicler_view);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
         GridLayoutManager manager = new GridLayoutManager(getBaseContext(), COUNT_COLUMN);
-        mainRecyclerView = new MainViewRecyclerView(this, popularMovies);
-        recyclerView.setAdapter(mainRecyclerView);
+        paginationScrollListener = new PaginationScrollListener(manager, this);
+        paginationScrollListener.setLoaded();
+        recyclerView.addOnScrollListener(paginationScrollListener);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+
+        mAdapter = new MainViewRecyclerView(this, new ArrayList<PopularMovie>());
+        recyclerView.setAdapter(mAdapter);
         recyclerView.setLayoutManager(manager);
        if (savedInstanceState == null) {
            viewModel = new MainActivityViewModel(this);
-           if (isOnline() == true) {
-               viewModel.nextPage();
-               progressBar.setVisibility(ProgressBar.VISIBLE);
-           } else {
-               showAlertMassage("No connection with Internet.");
-           }
+           provideNextData();
        } else {
             PopularMovie[] savedMoview = (PopularMovie[]) savedInstanceState.getParcelableArray(SAVEINSTANCE);
             popularMovies = new ArrayList<PopularMovie>(Arrays.asList(savedMoview));
-            mainRecyclerView.notifyDataSetChanged();
+            mAdapter.setPopularMovies(popularMovies);
+            //mAdapter.notifyDataSetChanged();
        }
-
-
-
     }
 
     @Override
@@ -68,6 +77,46 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
         savedMovie = popularMovies.toArray(savedMovie);
         outState.putParcelableArray(SAVEINSTANCE, savedMovie );
         super.onSaveInstanceState(outState, outPersistentState);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.type_movie_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.popular_movie:
+                changeTypeMovieRequest(TypeRequest.POPULAR);
+                return true;
+            case R.id.top_rated_movie:
+                changeTypeMovieRequest(TypeRequest.RATED);
+               return  true;
+                default:
+                    return super.onOptionsItemSelected(item);
+
+        }
+    }
+
+    void provideNextData() {
+        if (isOnline() == true) {
+            viewModel.nextPage();
+            progressBar.setVisibility(ProgressBar.VISIBLE);
+        } else {
+            showAlertMassage("No connection with Internet.");
+        }
+    }
+
+    void changeTypeMovieRequest(TypeRequest type) {
+        viewModel.setTypeRequest(type);
+        mAdapter.setPopularMovies(new ArrayList<PopularMovie>());
+        popularMovies = new ArrayList<>();
+        DataManager.getInstance().get_response().set_page(0);
+        DataManager.getInstance().get_response().setResults(new ArrayList<PopularMovie>());
+        provideNextData();
     }
 
     void showAlertMassage(String errorMessage) {
@@ -102,9 +151,13 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
     @Override
     public void fetchPopularMoview(ArrayList<PopularMovie> movies, ConnectionState state) {
         downloadingState = state;
-        this.popularMovies = movies;
+        if (popularMovies != null && popularMovies.size() > 0) {
+            mAdapter.removeNull();
+        }
+        this.popularMovies = DataManager.getInstance().get_response().getResults();
         progressBar.setVisibility(ProgressBar.INVISIBLE);
-        mainRecyclerView.notifyDataSetChanged();
+        mAdapter.addAll(movies);
+        paginationScrollListener.setLoaded();
     }
 
     @Override
@@ -122,5 +175,15 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
     }
 
 
+    @Override
+    public void onLoadMore() {
+        mAdapter.addNullData();
+        if (DataManager.getInstance().get_response().get_total_pages() <= DataManager.getInstance().get_response().get_page()){
+            paginationScrollListener.addEndOfRequests();
+        } else {
+            provideNextData();
+        }
+
+    }
 }
 

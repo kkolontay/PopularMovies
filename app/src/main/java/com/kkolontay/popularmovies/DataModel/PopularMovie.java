@@ -79,7 +79,8 @@ public class PopularMovie implements Parcelable {
     }
 
     public String get_poster_path() {
-        return _poster_path;
+
+            return _poster_path;
     }
 
     public void set_poster_path(String _poster_path) {

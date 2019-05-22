@@ -77,7 +77,9 @@ public class ObjectsDataJSONParser {
             double populatiry = object.getDouble(PopularMovie.POPULARITY);
             movie.set_popularity(populatiry);
             String posterPath = object.getString(PopularMovie.POSTED_PATH);
-            movie.set_poster_path(posterPath);
+            if (posterPath != null) {
+                movie.set_poster_path(posterPath);
+            }
             String originalTitle = object.getString(PopularMovie.ORIGINAL_TITLE);
             movie.set_original_title(originalTitle);
             JSONArray genders = object.optJSONArray(PopularMovie.GENRE_ID);

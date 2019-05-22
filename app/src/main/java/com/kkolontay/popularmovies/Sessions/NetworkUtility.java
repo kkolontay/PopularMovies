@@ -1,16 +1,7 @@
 package com.kkolontay.popularmovies.Sessions;
 
-import android.content.ContentValues;
-import android.content.Context;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.util.Log;
-
-import com.kkolontay.popularmovies.MainActivity;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +12,7 @@ import java.util.Scanner;
 
 public final class NetworkUtility {
 
-    //TODO: Past API KEY
+    //TODO: Put API KEY
 
     private static final  String API_KEY = "";
     private static final String HOST = "https://api.themoviedb.org/3/";

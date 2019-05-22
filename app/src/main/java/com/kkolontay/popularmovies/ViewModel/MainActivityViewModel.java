@@ -19,7 +19,11 @@ public class MainActivityViewModel {
     private WeakReference<MainActivityInterface> delegateMainActivity;
     private final String TAG = MainActivityViewModel.class.getSimpleName();
     private ConnectionState state = ConnectionState.SUCCESS;
+    private TypeRequest typeRequest = TypeRequest.POPULAR;
 
+    public void setTypeRequest(TypeRequest typeRequest) {
+        this.typeRequest = typeRequest;
+    }
 
     public MainActivityViewModel(MainActivityInterface delegate) {
         this.delegateMainActivity = new WeakReference<>(delegate);
@@ -32,7 +36,7 @@ public class MainActivityViewModel {
         nextPage = nextPage + 1;
         URL url = null;
         if (nextPage <= dataManager.get_response().get_total_pages()) {
-            url = NetworkUtility.buildURL(nextPage, TypeRequest.POPULAR);
+            url = NetworkUtility.buildURL(nextPage, typeRequest);
             if (url != null) {
                 new FetchMoviesList().execute(url);
             }
@@ -77,7 +81,7 @@ public class MainActivityViewModel {
                 ResponseDataObject responseDataObject = ObjectsDataJSONParser.getResponseDataObgert(s);
                 if (responseDataObject != null) {
                     dataManager.set_response(responseDataObject);
-                    delegateMainActivity.get().fetchPopularMoview(dataManager.get_response().getResults(), ConnectionState.SUCCESS);
+                    delegateMainActivity.get().fetchPopularMoview(responseDataObject.getResults(), ConnectionState.SUCCESS);
                 }
 
             }
