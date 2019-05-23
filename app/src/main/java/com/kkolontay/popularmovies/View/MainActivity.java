@@ -2,6 +2,7 @@ package com.kkolontay.popularmovies.View;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.PersistableBundle;
 import android.provider.ContactsContract;
@@ -23,6 +24,7 @@ import com.kkolontay.popularmovies.DataManager.DataManager;
 import com.kkolontay.popularmovies.DataModel.PopularMovie;
 import com.kkolontay.popularmovies.R;
 import com.kkolontay.popularmovies.Sessions.TypeRequest;
+import com.kkolontay.popularmovies.View.DetailMovie.DetailMovieActivity;
 import com.kkolontay.popularmovies.View.Pagination.PaginationScrollListener;
 import com.kkolontay.popularmovies.ViewModel.MainActivityInterface;
 import com.kkolontay.popularmovies.ViewModel.MainActivityViewModel;
@@ -30,8 +32,9 @@ import com.kkolontay.popularmovies.ViewModel.MainActivityViewModel;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public final class MainActivity extends AppCompatActivity implements MainActivityInterface, PaginationScrollListener.OnLoadMoreListener {
+public final class MainActivity extends AppCompatActivity implements MainActivityInterface, PaginationScrollListener.OnLoadMoreListener, MainViewRecyclerView.MovieAdapterOnClickHandler {
     final String SAVEINSTANCE = "POPULAR_MOVIES";
+    public static final String PUTEXTRAMOVIEDETAIL = "putExtraMovieDetail";
     public static String TAG = MainActivity.class.getSimpleName();
     private Dialog dialog;
     private ConnectionState downloadingState = ConnectionState.SUCCESS;
@@ -65,18 +68,20 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
            provideNextData();
        } else {
             PopularMovie[] savedMoview = (PopularMovie[]) savedInstanceState.getParcelableArray(SAVEINSTANCE);
-            popularMovies = new ArrayList<PopularMovie>(Arrays.asList(savedMoview));
-            mAdapter.setPopularMovies(popularMovies);
-            //mAdapter.notifyDataSetChanged();
+            if (savedMoview != null) {
+                popularMovies = new ArrayList<PopularMovie>(Arrays.asList(savedMoview));
+                mAdapter.setPopularMovies(popularMovies);
+                //mAdapter.notifyDataSetChanged();
+            }
        }
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+    public void onSaveInstanceState(Bundle outState) {
         PopularMovie[] savedMovie = new PopularMovie[popularMovies.size()];
         savedMovie = popularMovies.toArray(savedMovie);
         outState.putParcelableArray(SAVEINSTANCE, savedMovie );
-        super.onSaveInstanceState(outState, outPersistentState);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -183,6 +188,14 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
         } else {
             provideNextData();
         }
+
+    }
+
+    @Override
+    public void movieOnClickHander(PopularMovie movie) {
+        Intent detailIntent = new Intent(this, DetailMovieActivity.class);
+        detailIntent.putExtra(PUTEXTRAMOVIEDETAIL, movie);
+        startActivity(detailIntent);
 
     }
 }

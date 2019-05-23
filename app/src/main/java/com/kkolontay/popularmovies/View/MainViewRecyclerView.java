@@ -26,10 +26,14 @@ public class MainViewRecyclerView extends RecyclerView.Adapter<MainViewRecyclerV
     final int LOADING = 1;
     final int ITEM = 2;
     private static final String TAG = MainViewRecyclerView.class.getSimpleName();
+    private MovieAdapterOnClickHandler clickHandler;
 
     public MainViewRecyclerView(Context context, ArrayList<PopularMovie> popularMovies) {
         this.context = context;
         this.popularMovies = popularMovies;
+        if(context instanceof MainActivity) {
+            clickHandler = (MainActivity) context;
+        }
     }
     public void setPopularMovies(ArrayList<PopularMovie> popularMovies) {
         this.popularMovies = popularMovies;
@@ -57,7 +61,7 @@ public class MainViewRecyclerView extends RecyclerView.Adapter<MainViewRecyclerV
         if (getItemViewType(i) == ITEM) {
             if (popularMovieViewHolder instanceof PopularMovieViewHolder) {
                 PopularMovieViewHolder popularHolder = (PopularMovieViewHolder) popularMovieViewHolder;
-
+                popularHolder.setPosition(i);
                 if (popularMovies.get(i).get_poster_path() != null) {
                     String imagePath = popularMovies.get(i).get_poster_path();
                     String imageUrl = NetworkUtility.getImageURLString(imagePath, SizeImage.SMAL);
@@ -107,42 +111,10 @@ public class MainViewRecyclerView extends RecyclerView.Adapter<MainViewRecyclerV
     public void addAll(ArrayList<PopularMovie> mcList) {
         for (PopularMovie mc : mcList) { add(mc); }
     }
-//
-//    public void remove(PopularMovie movie) {
-//        int position = popularMovies.indexOf(movie);
-//        if (position > -1) {
-//            popularMovies.remove(position);
-//            notifyItemRemoved(position);
-//        }
-//    }
 
-//    public void clear() {
-//        isLoadingAdded = false;
-//        while (getItemCount() > 0) { remove(getItem(0)); }
-//    }
-
-   // public boolean isEmpty() { return getItemCount() == 0; }
-
-//    public void addLoadingFooter() {
-//        isLoadingAdded = true;
-//        //add(new Movie());
-//    }
-//
-//    public void removeLoadingFooter() {
-//        isLoadingAdded = false;
-//
-//        int position = movies.size() - 1;
-//        Movie item = getItem(position);
-//        if (item != null) {
-//            movies.remove(position);
-//            notifyItemRemoved(position);
-//        }
-//    }
-//
-//    public PopularMovie getItem(int position) {
-//        return popularMovies.get(position);
-//    }
-
+public interface MovieAdapterOnClickHandler {
+        public void movieOnClickHander(PopularMovie movie);
+}
 
 
     public class ProgressBarViewHolder extends ParentViewHolder {
@@ -160,19 +132,32 @@ public class MainViewRecyclerView extends RecyclerView.Adapter<MainViewRecyclerV
         }
 
     }
-    public class PopularMovieViewHolder extends ParentViewHolder {
+    public class PopularMovieViewHolder extends ParentViewHolder implements View.OnClickListener {
         public ImageView getmImageView() {
             return mImageView;
         }
 
         private ImageView mImageView;
 
+        public void setPosition(int position) {
+            this.position = position;
+        }
+
+        private int position;
+
 
         public PopularMovieViewHolder(@NonNull View itemView) {
             super(itemView);
             mImageView = (ImageView) itemView.findViewById(R.id.movie_image);
+            mImageView.setOnClickListener(this);
         }
 
+
+
+        @Override
+        public void onClick(View v) {
+            clickHandler.movieOnClickHander(popularMovies.get(position));
+        }
     }
 
     public class ParentViewHolder extends RecyclerView.ViewHolder {
