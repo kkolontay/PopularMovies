@@ -1,1 +1,1 @@
-Plese, put your API KEY in NetworkUtility.java. This place marked as TODO.
+Please, put your API KEY in NetworkUtility.java. This place marked as TODO.
