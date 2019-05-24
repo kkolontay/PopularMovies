@@ -15,8 +15,8 @@ import java.net.URL;
 
 
 public class MainActivityViewModel {
-    private DataManager dataManager;
-    private WeakReference<MainActivityInterface> delegateMainActivity;
+    private final DataManager dataManager;
+    private final WeakReference<MainActivityInterface> delegateMainActivity;
     private final String TAG = MainActivityViewModel.class.getSimpleName();
     private ConnectionState state = ConnectionState.SUCCESS;
     private TypeRequest typeRequest = TypeRequest.POPULAR;
@@ -47,7 +47,7 @@ public class MainActivityViewModel {
         fetchNextPageMovies();
     }
 
-    private  class FetchMoviesList extends AsyncTask<URL, Void, String>  {
+    private class FetchMoviesList extends AsyncTask<URL, Void, String>  {
 
         @Override
         protected String doInBackground(URL... urls) {
@@ -60,7 +60,7 @@ public class MainActivityViewModel {
 
                 } catch(RequestMovieError e) {
                     String error = ObjectsDataJSONParser.getErrorDescription(e.getMessage());
-                    state = ConnectionState.ERORR;
+                    state = ConnectionState.ERROR;
                     Log.i(TAG, error);
                     
                     delegateMainActivity.get().errorConnection(error, state);
@@ -78,10 +78,10 @@ public class MainActivityViewModel {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             if (state == ConnectionState.SUCCESS) {
-                ResponseDataObject responseDataObject = ObjectsDataJSONParser.getResponseDataObgert(s);
+                ResponseDataObject responseDataObject = ObjectsDataJSONParser.getResponseDataObject(s);
                 if (responseDataObject != null) {
                     dataManager.set_response(responseDataObject);
-                    delegateMainActivity.get().fetchPopularMoview(responseDataObject.getResults(), ConnectionState.SUCCESS);
+                    delegateMainActivity.get().fetchPopularMovie(responseDataObject.getResults(), ConnectionState.SUCCESS);
                 }
 
             }

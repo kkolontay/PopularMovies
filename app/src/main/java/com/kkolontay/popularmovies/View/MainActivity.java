@@ -4,15 +4,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
-import android.os.PersistableBundle;
-import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -33,14 +30,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public final class MainActivity extends AppCompatActivity implements MainActivityInterface, PaginationScrollListener.OnLoadMoreListener, MainViewRecyclerView.MovieAdapterOnClickHandler {
-    final String SAVEINSTANCE = "POPULAR_MOVIES";
+    private static final String SAVEINSTANCE = "POPULAR_MOVIES";
     public static final String PUTEXTRAMOVIEDETAIL = "putExtraMovieDetail";
-    public static String TAG = MainActivity.class.getSimpleName();
-    private Dialog dialog;
     private ConnectionState downloadingState = ConnectionState.SUCCESS;
     private ArrayList<PopularMovie> popularMovies;
     private MainActivityViewModel viewModel;
-    private RecyclerView recyclerView;
     private final int COUNT_COLUMN = 3;
     private MainViewRecyclerView mAdapter;
     private ProgressBar progressBar;
@@ -51,7 +45,7 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        recyclerView = (RecyclerView) findViewById(R.id.main_recicler_view);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.main_recicler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         GridLayoutManager manager = new GridLayoutManager(getBaseContext(), COUNT_COLUMN);
@@ -67,11 +61,10 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
            viewModel = new MainActivityViewModel(this);
            provideNextData();
        } else {
-            PopularMovie[] savedMoview = (PopularMovie[]) savedInstanceState.getParcelableArray(SAVEINSTANCE);
-            if (savedMoview != null) {
-                popularMovies = new ArrayList<PopularMovie>(Arrays.asList(savedMoview));
+            PopularMovie[] savedMovie = (PopularMovie[]) savedInstanceState.getParcelableArray(SAVEINSTANCE);
+            if (savedMovie != null) {
+                popularMovies = new ArrayList<PopularMovie>(Arrays.asList(savedMovie));
                 mAdapter.setPopularMovies(popularMovies);
-                //mAdapter.notifyDataSetChanged();
             }
        }
     }
@@ -106,8 +99,8 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
         }
     }
 
-    void provideNextData() {
-        if (isOnline() == true) {
+   private void provideNextData() {
+        if (isOnline()) {
             viewModel.nextPage();
             progressBar.setVisibility(ProgressBar.VISIBLE);
         } else {
@@ -115,7 +108,7 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
         }
     }
 
-    void changeTypeMovieRequest(TypeRequest type) {
+    private void changeTypeMovieRequest(TypeRequest type) {
         viewModel.setTypeRequest(type);
         mAdapter.setPopularMovies(new ArrayList<PopularMovie>());
         popularMovies = new ArrayList<>();
@@ -124,7 +117,7 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
         provideNextData();
     }
 
-    void showAlertMassage(String errorMessage) {
+    private void showAlertMassage(String errorMessage) {
         progressBar.setVisibility(ProgressBar.INVISIBLE);
               final  Dialog dialog = new Dialog(this);
                 dialog.setContentView(R.layout.alert_dialog);
@@ -145,7 +138,7 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
                 dialog.show();
     }
 
-    public boolean isOnline() {
+    private boolean isOnline() {
         ConnectivityManager cm =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -154,7 +147,7 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
     }
 
     @Override
-    public void fetchPopularMoview(ArrayList<PopularMovie> movies, ConnectionState state) {
+    public void fetchPopularMovie(ArrayList<PopularMovie> movies, ConnectionState state) {
         downloadingState = state;
         if (popularMovies != null && popularMovies.size() > 0) {
             mAdapter.removeNull();
@@ -192,7 +185,7 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
     }
 
     @Override
-    public void movieOnClickHander(PopularMovie movie) {
+    public void movieOnClickHandler(PopularMovie movie) {
         Intent detailIntent = new Intent(this, DetailMovieActivity.class);
         detailIntent.putExtra(PUTEXTRAMOVIEDETAIL, movie);
         startActivity(detailIntent);

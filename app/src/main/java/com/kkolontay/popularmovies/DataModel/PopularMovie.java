@@ -163,7 +163,7 @@ public class PopularMovie implements Parcelable {
     private PopularMovie(Parcel in) {
         _vote_count = in.readInt();
          _id = in.readInt();
-        _video = (in.readInt() == 1? true: false);
+        _video = (in.readInt() == 1);
         _vote_average = in.readDouble();
         _title = in.readString();
         _popularity = in.readDouble();

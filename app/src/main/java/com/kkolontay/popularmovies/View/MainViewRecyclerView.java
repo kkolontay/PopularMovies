@@ -1,7 +1,6 @@
 package com.kkolontay.popularmovies.View;
 
 import android.content.Context;
-import android.graphics.Movie;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,18 +17,16 @@ import com.kkolontay.popularmovies.Sessions.SizeImage;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainViewRecyclerView extends RecyclerView.Adapter<MainViewRecyclerView.ParentViewHolder> {
-    private Context context;
+
     private ArrayList<PopularMovie> popularMovies;
-    final int LOADING = 1;
-    final int ITEM = 2;
+    private final int LOADING = 1;
+    private final int ITEM = 2;
     private static final String TAG = MainViewRecyclerView.class.getSimpleName();
     private MovieAdapterOnClickHandler clickHandler;
 
     public MainViewRecyclerView(Context context, ArrayList<PopularMovie> popularMovies) {
-        this.context = context;
         this.popularMovies = popularMovies;
         if(context instanceof MainActivity) {
             clickHandler = (MainActivity) context;
@@ -64,14 +61,13 @@ public class MainViewRecyclerView extends RecyclerView.Adapter<MainViewRecyclerV
                 popularHolder.setPosition(i);
                 if (popularMovies.get(i).get_poster_path() != null) {
                     String imagePath = popularMovies.get(i).get_poster_path();
-                    String imageUrl = NetworkUtility.getImageURLString(imagePath, SizeImage.SMAL);
-                    Picasso.get().load(imageUrl).placeholder(R.drawable.no_image).error(R.drawable.no_image).into(popularHolder.getmImageView());
+                    String imageUrl = NetworkUtility.getImageURLString(imagePath, SizeImage.SMALL);
+                    Picasso.get().load(imageUrl).placeholder(R.drawable.no_image).error(R.drawable.no_image).into(popularHolder.getImageView());
                 } else {
-                    Picasso.get().load("").placeholder(R.drawable.no_image).error(R.drawable.no_image).into(popularHolder.getmImageView());
+                    Picasso.get().load("").placeholder(R.drawable.no_image).error(R.drawable.no_image).into(popularHolder.getImageView());
                 }
             }
         }
-       // popularMovieViewHolder.bindData(imagePath);
     }
 
     @Override
@@ -113,33 +109,29 @@ public class MainViewRecyclerView extends RecyclerView.Adapter<MainViewRecyclerV
     }
 
 public interface MovieAdapterOnClickHandler {
-        public void movieOnClickHander(PopularMovie movie);
+         void movieOnClickHandler(PopularMovie movie);
 }
 
 
-    public class ProgressBarViewHolder extends ParentViewHolder {
-        public ProgressBar getProgressBar() {
-            return mProgressBar;
-        }
+    private class ProgressBarViewHolder extends ParentViewHolder {
 
-        private ProgressBar mProgressBar;
+        private final ProgressBar mProgressBar;
 
-
-        public ProgressBarViewHolder(@NonNull View itemView) {
+        private ProgressBarViewHolder(@NonNull View itemView) {
             super(itemView);
             mProgressBar = (ProgressBar) itemView.findViewById(R.id.progressbarViewHolder);
             mProgressBar.setVisibility(ProgressBar.VISIBLE);
         }
 
     }
-    public class PopularMovieViewHolder extends ParentViewHolder implements View.OnClickListener {
-        public ImageView getmImageView() {
+    private class PopularMovieViewHolder extends ParentViewHolder implements View.OnClickListener {
+        public ImageView getImageView() {
             return mImageView;
         }
 
         private ImageView mImageView;
 
-        public void setPosition(int position) {
+        private void setPosition(int position) {
             this.position = position;
         }
 
@@ -156,7 +148,7 @@ public interface MovieAdapterOnClickHandler {
 
         @Override
         public void onClick(View v) {
-            clickHandler.movieOnClickHander(popularMovies.get(position));
+            clickHandler.movieOnClickHandler(popularMovies.get(position));
         }
     }
 

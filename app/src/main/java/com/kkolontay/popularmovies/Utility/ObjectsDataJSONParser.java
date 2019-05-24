@@ -12,7 +12,7 @@ public class ObjectsDataJSONParser {
     private static final String STATUSMESSAGE = "status_message";
     //private static final String STATUSCODE = "status_code";
 
-    public static ResponseDataObject getResponseDataObgert(String json) {
+    public static ResponseDataObject getResponseDataObject(String json) {
         ResponseDataObject responseDataObject = new ResponseDataObject();
         try {
             JSONObject object = new JSONObject(json);
@@ -50,7 +50,7 @@ public class ObjectsDataJSONParser {
         for (int i = 0; i < objects.length(); i++) {
             try {
                 JSONObject object = objects.getJSONObject(i);
-                PopularMovie movie = getPopularMoviewObject(object);
+                PopularMovie movie = getPopularMovieObject(object);
                 if (movie != null) {
                     moviesList.add(movie);
                 }
@@ -61,7 +61,7 @@ public class ObjectsDataJSONParser {
         return moviesList;
     }
 
-    private static PopularMovie getPopularMoviewObject(JSONObject object) {
+    private static PopularMovie getPopularMovieObject(JSONObject object) {
         PopularMovie movie = new PopularMovie();
         try {
             int voteCount = object.getInt(PopularMovie.VOTECOUNT);

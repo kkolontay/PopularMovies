@@ -1,6 +1,12 @@
 <resources>
-    <string name="app_name">PopularMovies</string>
-    <string name="alert_message">AlertMessage</string>
-    <string name="ok_button">Ok</string>
+    <string name="app_name">Popular Movies</string>
+    <string name="alert_message">Alert Message</string>
+    <string name="ok_button">OK</string>
     <string name="no_image_downloaded">no image downloaded</string>
+    <string name="poster_for_movie">Poster for movie.</string>
+    <string name="vote_average">Vote average:</string>
+    <string name="plot_synopsis">Plot synopsis:</string>
+    <string name="date_release">Date release:</string>
+    <string name="popular_movie">Popular movie</string>
+    <string name="top_rated_movie">Top rated movie</string>
 </resources>
