@@ -13,7 +13,7 @@ public final class NetworkUtility {
 
     //TODO: Put API KEY
 
-    private static final  String API_KEY = "";
+    //private static final  String API_KEY = "099060dbf9285dbaaefbe834e2d7ae18";
     private static final String HOST = "https://api.themoviedb.org/3/";
     private static final String PATH_POPULAR_MOVIE = "movie/popular";
     private static final String PATH_TOP_RATED_MOVIE = "movie/top_rated";
@@ -74,7 +74,7 @@ public final class NetworkUtility {
         Uri buildUri = null;
         if (urlString != null) {
             buildUri = Uri.parse(urlString).buildUpon()
-                    .appendQueryParameter(API_REQUEST_KEY, API_KEY)
+                    .appendQueryParameter(API_REQUEST_KEY, project.)
                     .appendQueryParameter(PAGE_REQUEST_KEY, Integer.toString(numberPage)).build();
         }
         URL url = null;

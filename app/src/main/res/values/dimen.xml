@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="smallMarging">5dp</dimen>
+    <dimen name="bigMarging">24dp</dimen>
+    <dimen name="sizePrograssBar">50dp</dimen>
+    <dimen name="zeroMarging">0dp</dimen>
+    <dimen name="smallTextSize">12sp</dimen>
+    <dimen name="middleTextSize">14sp</dimen>
+    <dimen name="bigTextSize">18sp</dimen>
+</resources>

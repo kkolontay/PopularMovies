@@ -8,13 +8,13 @@
         android:id="@+id/main_recicler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginBottom="0dp" />
+        android:layout_marginStart="@dimen/zeroMarging"
+        android:layout_marginTop="@dimen/zeroMarging"
+        android:layout_marginEnd="@dimen/zeroMarging"
+        android:layout_marginBottom="@dimen/zeroMarging" />
     <ProgressBar
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width= "@dimen/sizePrograssBar"
+        android:layout_height="@dimen/sizePrograssBar"
         android:id="@+id/progressBar"
         android:visibility="invisible"
         android:layout_gravity="center" />

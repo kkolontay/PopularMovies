@@ -1,0 +1,21 @@
+
+<LinearLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal">
+
+<TextView
+
+    style="@style/CustomTextView"
+    android:textSize="@dimen/smallTextSize"
+    android:textStyle="bold"
+    android:text="@string/plot_synopsis"/>
+
+<TextView
+    android:id="@+id/plot_movie"
+   style="@style/CustomTextView"
+    android:textSize="@dimen/middleTextSize"
+    android:textStyle="normal" />
+
+</LinearLayout>

@@ -14,12 +14,19 @@ buildscript {
     }
 }
 
+
+
+
 allprojects {
     repositories {
         google()
         jcenter()
-        
+
     }
+    project.ext {
+        accessApiKey = "099060dbf9285dbaaefbe834e2d7ae18"
+    }
+
 }
 
 task clean(type: Delete) {

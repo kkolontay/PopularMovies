@@ -8,4 +8,15 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="CustomTextView" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:layout_marginStart">@dimen/bigMarging</item>
+        <item name="android:layout_marginTop">@dimen/smallMarging</item>
+        <item name="android:layout_marginEnd">@dimen/smallMarging</item>
+        <item name="android:textAlignment">viewStart</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+
+    </style>
+
 </resources>
