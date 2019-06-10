@@ -113,7 +113,7 @@ public interface MovieAdapterOnClickHandler {
 }
 
 
-    private class ProgressBarViewHolder extends ParentViewHolder {
+    public class ProgressBarViewHolder extends ParentViewHolder {
 
         private final ProgressBar mProgressBar;
 

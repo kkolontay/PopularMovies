@@ -1,5 +1,5 @@
 package com.kkolontay.popularmovies.Sessions;
 
 public enum TypeRequest {
-    POPULAR, RATED
+    POPULAR, RATED, VIDEO, VIEWS
 }

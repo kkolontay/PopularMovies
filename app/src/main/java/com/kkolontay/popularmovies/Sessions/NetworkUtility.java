@@ -9,11 +9,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
+
 public final class NetworkUtility {
 
-    //TODO: Put API KEY
+    public static final String KEYAPI = "";
 
-    //private static final  String API_KEY = "099060dbf9285dbaaefbe834e2d7ae18";
     private static final String HOST = "https://api.themoviedb.org/3/";
     private static final String PATH_POPULAR_MOVIE = "movie/popular";
     private static final String PATH_TOP_RATED_MOVIE = "movie/top_rated";
@@ -24,8 +24,10 @@ public final class NetworkUtility {
     private static final String BIG_SIZE_IMAGE = "w780";
     private static final String SMALL_SIZE_IMAGE = "w185";
     private static final String MIDDLE_SIZE_IMAGE = "w500";
+    private static final String MOVIE_VIDEO_PATH = "movie/%1$d/videos";
+    private static final String MOVIE_REVIEWS_PATH = "movie/%1$d/reviews";
 
-    public static String getResponseFromHttpUrl(URL url) throws Exception { // IOExeption
+    public static String getResponseFromHttpUrl(URL url) throws Exception {
 
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         if(urlConnection.getResponseCode() > 299) {
@@ -38,8 +40,6 @@ public final class NetworkUtility {
         }
 
         try {
-
-           // InputStream in = urlConnection.getInputStream();
 
             Scanner scanner = new Scanner(in);
             scanner.useDelimiter("\\A");
@@ -64,18 +64,34 @@ public final class NetworkUtility {
         return  null;
     }
 
-    public static URL buildURL(int numberPage, TypeRequest request) {
+    public static URL buildURL(int numberPage, TypeRequest request, int idMovie) {
         String urlString = null;
-        if (request == TypeRequest.POPULAR) {
-            urlString = HOST + PATH_POPULAR_MOVIE;
-        } else {
-            urlString = HOST + PATH_TOP_RATED_MOVIE;
+        switch (request) {
+            case RATED:
+                urlString = HOST + PATH_TOP_RATED_MOVIE;
+                break;
+            case POPULAR:
+                urlString = HOST + PATH_POPULAR_MOVIE;
+                break;
+            case VIDEO:
+                urlString = HOST + String.format(MOVIE_VIDEO_PATH, idMovie);
+                break;
+            case VIEWS:
+                urlString = HOST + String.format(MOVIE_REVIEWS_PATH, idMovie);
+                break;
+
         }
+
         Uri buildUri = null;
         if (urlString != null) {
-            buildUri = Uri.parse(urlString).buildUpon()
-                    .appendQueryParameter(API_REQUEST_KEY, project.)
-                    .appendQueryParameter(PAGE_REQUEST_KEY, Integer.toString(numberPage)).build();
+            if (request != TypeRequest.VIDEO) {
+                buildUri = Uri.parse(urlString).buildUpon()
+                        .appendQueryParameter(API_REQUEST_KEY, KEYAPI)
+                        .appendQueryParameter(PAGE_REQUEST_KEY, Integer.toString(numberPage)).build();
+            } else {
+                buildUri = Uri.parse(urlString).buildUpon()
+                        .appendQueryParameter(API_REQUEST_KEY, KEYAPI).build();
+            }
         }
         URL url = null;
         if (buildUri != null) {

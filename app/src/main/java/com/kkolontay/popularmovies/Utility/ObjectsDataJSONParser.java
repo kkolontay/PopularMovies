@@ -1,16 +1,14 @@
 package com.kkolontay.popularmovies.Utility;
-
 import com.kkolontay.popularmovies.DataModel.PopularMovie;
 import com.kkolontay.popularmovies.DataModel.ResponseDataObject;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 
 public class ObjectsDataJSONParser {
     private static final String STATUSMESSAGE = "status_message";
-    //private static final String STATUSCODE = "status_code";
+    private  static final String RESULTS = "results";
+    private static final String KEYTEASER = "key";
 
     public static ResponseDataObject getResponseDataObject(String json) {
         ResponseDataObject responseDataObject = new ResponseDataObject();
@@ -32,6 +30,23 @@ public class ObjectsDataJSONParser {
             return null;
         }
         return responseDataObject;
+    }
+
+    public static String getIdVideoTeaser( String json) {
+        try {
+            JSONObject object = new JSONObject(json);
+            JSONArray results = object.getJSONArray(RESULTS);
+            JSONObject objectMovie = results.getJSONObject(0);
+            if (objectMovie != null) {
+                return  objectMovie.getString(KEYTEASER);
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return  null;
+        }
+        return  null;
     }
 
     public static String getErrorDescription(String json) {

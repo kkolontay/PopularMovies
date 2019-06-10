@@ -14,7 +14,7 @@ buildscript {
     }
 }
 
-
+project.ext.restKEYAPI = "099060dbf9285dbaaefbe834e2d7ae18"
 
 
 allprojects {
@@ -22,9 +22,6 @@ allprojects {
         google()
         jcenter()
 
-    }
-    project.ext {
-        accessApiKey = "099060dbf9285dbaaefbe834e2d7ae18"
     }
 
 }

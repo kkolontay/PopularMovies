@@ -34,9 +34,9 @@ public class MainActivityViewModel {
     private void fetchNextPageMovies() {
         int nextPage = dataManager.get_response().get_page();
         nextPage = nextPage + 1;
-        URL url = null;
+        URL url;
         if (nextPage <= dataManager.get_response().get_total_pages()) {
-            url = NetworkUtility.buildURL(nextPage, typeRequest);
+            url = NetworkUtility.buildURL(nextPage, typeRequest, 0);
             if (url != null) {
                 new FetchMoviesList().execute(url);
             }
