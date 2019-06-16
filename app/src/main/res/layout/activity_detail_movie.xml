@@ -29,6 +29,7 @@
 
             <include layout="@layout/linear_detail_vote"/>
             <include layout="@layout/linear_detail_description"/>
+            <include layout="@layout/youtube_player"/>
             <include layout="@layout/linear_detail_date"/>
 
         </LinearLayout>
