@@ -30,6 +30,13 @@
             <include layout="@layout/linear_detail_vote"/>
             <include layout="@layout/linear_detail_description"/>
             <include layout="@layout/youtube_player"/>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/reviews"
+                android:layout_margin="@dimen/middle_marging"
+                android:textSize="@dimen/bigTextSize"
+                android:id="@+id/movie_views_bt"/>
             <include layout="@layout/linear_detail_date"/>
 
         </LinearLayout>

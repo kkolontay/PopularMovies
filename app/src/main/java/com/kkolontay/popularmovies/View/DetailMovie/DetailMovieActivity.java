@@ -1,13 +1,14 @@
 package com.kkolontay.popularmovies.View.DetailMovie;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.google.android.youtube.player.YouTubeBaseActivity;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
@@ -21,8 +22,8 @@ import com.kkolontay.popularmovies.Sessions.SizeImage;
 import com.kkolontay.popularmovies.Sessions.TypeRequest;
 import com.kkolontay.popularmovies.Utility.ObjectsDataJSONParser;
 import com.kkolontay.popularmovies.View.MainActivity;
+import com.kkolontay.popularmovies.View.MovieReviews.MovieReviews;
 import com.squareup.picasso.Picasso;
-
 import java.net.URL;
 
 
@@ -30,8 +31,8 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
 
     private PopularMovie movie;
     private static final String TAG = DetailMovieActivity.class.getSimpleName();
+    public static final String MOVIEID = "movie_id";
     private static final String SAVEDINSTANCE = "POPULAR_MOVIE";
-    private static final String YOUTUBELINK = "https://www.youtube.com/watch?v=";
     private static final String MOVIEIDKEY = "moviewIdKey";
     private TextView dateReleaseTextView;
     private TextView plotSynopsisTextView;
@@ -41,7 +42,7 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
     private YouTubePlayerView youTubePlayerView;
     private String keyTeaserMovie;
     private YouTubePlayer player;
-   // private boolean mAutoRotation = false;
+    private Button movieReviewsButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +53,7 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
         voteAverageTextView = findViewById(R.id.vote_average);
         moviePosterImageView = findViewById(R.id.movie_poster);
         youTubePlayerView = findViewById(R.id.youtube_player);
-//        mAutoRotation = Settings.System.getInt(getContentResolver(),
-//                Settings.System.ACCELEROMETER_ROTATION, 0) == 1;
+        movieReviewsButton = findViewById(R.id.movie_views_bt);
         if (savedInstanceState == null) {
                 movie = getIntent().getExtras().getParcelable(MainActivity.PUTEXTRAMOVIEDETAIL);
             URL url = NetworkUtility.buildURL(0, TypeRequest.VIDEO, movie.get_id());
@@ -63,13 +63,18 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
         } else {
             movie = savedInstanceState.getParcelable(SAVEDINSTANCE);
             keyTeaserMovie = savedInstanceState.getString(MOVIEIDKEY);
-           // registrationYoutubePlayer();
-
         }
         if (movie != null) {
             setData(movie);
         }
-
+        movieReviewsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent reviews = new Intent(DetailMovieActivity.this, MovieReviews.class);
+                reviews.putExtra(MOVIEID, movie.get_id());
+                startActivity(reviews);
+            }
+        });
     }
 
     @Override
