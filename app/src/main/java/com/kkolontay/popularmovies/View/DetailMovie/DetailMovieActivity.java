@@ -14,12 +14,15 @@ import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerView;
 import com.kkolontay.popularmovies.ConnectionState;
+import com.kkolontay.popularmovies.DataManager.Room.AppDatabase;
+import com.kkolontay.popularmovies.DataManager.Room.SelectedPopularMovie;
 import com.kkolontay.popularmovies.DataModel.PopularMovie;
 import com.kkolontay.popularmovies.R;
 import com.kkolontay.popularmovies.Sessions.NetworkUtility;
 import com.kkolontay.popularmovies.Sessions.RequestMovieError;
 import com.kkolontay.popularmovies.Sessions.SizeImage;
 import com.kkolontay.popularmovies.Sessions.TypeRequest;
+import com.kkolontay.popularmovies.Utility.AppExecutors;
 import com.kkolontay.popularmovies.Utility.ObjectsDataJSONParser;
 import com.kkolontay.popularmovies.View.MainActivity;
 import com.kkolontay.popularmovies.View.MovieReviews.MovieReviews;
@@ -43,6 +46,9 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
     private String keyTeaserMovie;
     private YouTubePlayer player;
     private Button movieReviewsButton;
+    private Button selectedMovieButton;
+    private AppDatabase appDatabase;
+    private boolean isMovieSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +60,7 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
         moviePosterImageView = findViewById(R.id.movie_poster);
         youTubePlayerView = findViewById(R.id.youtube_player);
         movieReviewsButton = findViewById(R.id.movie_views_bt);
+        selectedMovieButton = findViewById(R.id.selected_movie_button);
         if (savedInstanceState == null) {
                 movie = getIntent().getExtras().getParcelable(MainActivity.PUTEXTRAMOVIEDETAIL);
             URL url = NetworkUtility.buildURL(0, TypeRequest.VIDEO, movie.get_id());
@@ -75,6 +82,57 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
                 startActivity(reviews);
             }
         });
+        selectedMovieButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppExecutors.getInstance().getDiskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        isMovieSelected = !isMovieSelected;
+                        if (isMovieSelected) {
+                            if ( appDatabase.selectedPopularMovie().fetchMovie(movie.get_id()) == null) {
+                                appDatabase.selectedPopularMovie().insertMovie(fetchEntity());
+                            }
+
+                        } else {
+                            if ( appDatabase.selectedPopularMovie().fetchMovie(movie.get_id()) != null) {
+                                appDatabase.selectedPopularMovie().deleteMovie(fetchEntity());
+                            }
+
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                setImageToSelectMovieButton();
+                            }
+                        });
+
+                    }
+                });
+
+
+            }
+        });
+        appDatabase = AppDatabase.getInstance(getApplicationContext());
+
+        AppExecutors.getInstance().getDiskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                if ( appDatabase.selectedPopularMovie().fetchMovie(movie.get_id()) == null) {
+                    isMovieSelected = false;
+                } else {
+                    isMovieSelected = true;
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        setImageToSelectMovieButton();
+                    }
+                });
+            }
+        });
+
+
     }
 
     @Override
@@ -89,6 +147,29 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
         super.onDestroy();
         player = null;
         youTubePlayerView = null;
+    }
+
+    private SelectedPopularMovie fetchEntity() {
+        return new SelectedPopularMovie(movie.get_vote_count(),
+                movie.get_id(),
+                true,
+                movie.get_vote_average(),
+                movie.get_title(),
+                movie.get_popularity(),
+                movie.get_poster_path(),
+                movie.get_original_title(),
+                movie.get_genre_ids(),
+                movie.get_backdrop_path(),
+                movie.get_overview(),
+                movie.get_release_date());
+    }
+
+    private void setImageToSelectMovieButton() {
+        if(isMovieSelected) {
+            selectedMovieButton.setBackgroundResource(R.drawable.fullstar);
+        } else {
+            selectedMovieButton.setBackgroundResource(R.drawable.emptystar);
+        }
     }
 
     private void setData(PopularMovie movie) {
