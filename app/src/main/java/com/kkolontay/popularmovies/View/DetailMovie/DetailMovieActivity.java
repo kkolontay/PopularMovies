@@ -91,12 +91,15 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
                         isMovieSelected = !isMovieSelected;
                         if (isMovieSelected) {
                             if ( appDatabase.selectedPopularMovie().fetchMovie(movie.get_id()) == null) {
-                                appDatabase.selectedPopularMovie().insertMovie(fetchEntity());
+                                SelectedPopularMovie selectedPopularMovie = fetchEntity();
+                                appDatabase.selectedPopularMovie().insertMovie(selectedPopularMovie);
+
                             }
 
                         } else {
-                            if ( appDatabase.selectedPopularMovie().fetchMovie(movie.get_id()) != null) {
-                                appDatabase.selectedPopularMovie().deleteMovie(fetchEntity());
+                            SelectedPopularMovie selectedPopularMovie = appDatabase.selectedPopularMovie().fetchMovie(movie.get_id());
+                            if ( selectedPopularMovie != null) {
+                                appDatabase.selectedPopularMovie().deleteMovie(selectedPopularMovie);
                             }
 
                         }
@@ -113,6 +116,11 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
 
             }
         });
+       setItemIsSelected();
+
+    }
+
+    private void setItemIsSelected() {
         appDatabase = AppDatabase.getInstance(getApplicationContext());
 
         AppExecutors.getInstance().getDiskIO().execute(new Runnable() {
@@ -132,7 +140,6 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
             }
         });
 
-
     }
 
     @Override
@@ -150,18 +157,22 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
     }
 
     private SelectedPopularMovie fetchEntity() {
-        return new SelectedPopularMovie(movie.get_vote_count(),
-                movie.get_id(),
-                true,
-                movie.get_vote_average(),
-                movie.get_title(),
-                movie.get_popularity(),
-                movie.get_poster_path(),
-                movie.get_original_title(),
-                movie.get_genre_ids(),
-                movie.get_backdrop_path(),
-                movie.get_overview(),
-                movie.get_release_date());
+
+        if (movie != null) {
+            return new SelectedPopularMovie(movie.get_vote_count(),
+                    movie.get_id(),
+                    true,
+                    movie.get_vote_average(),
+                    movie.get_title(),
+                    movie.get_popularity(),
+                    movie.get_poster_path(),
+                    movie.get_original_title(),
+                    movie.get_backdrop_path(),
+                    movie.get_overview(),
+                    movie.get_release_date());
+        } else {
+            return  null;
+        }
     }
 
     private void setImageToSelectMovieButton() {

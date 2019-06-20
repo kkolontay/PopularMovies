@@ -1,6 +1,9 @@
 package com.kkolontay.popularmovies.Utility;
+import android.os.Looper;
+
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.logging.Handler;
 
 public class AppExecutors {
     private static final Object LOCK = new Object();
@@ -29,6 +32,5 @@ public class AppExecutors {
     public Executor getNetworkIO() {
         return networkIO;
     }
-
 
 }

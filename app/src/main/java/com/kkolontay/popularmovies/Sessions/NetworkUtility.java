@@ -2,6 +2,7 @@ package com.kkolontay.popularmovies.Sessions;
 
 import android.net.Uri;
 import android.util.Log;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -30,7 +31,7 @@ public final class NetworkUtility {
     public static String getResponseFromHttpUrl(URL url) throws Exception {
 
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        if(urlConnection.getResponseCode() > 299) {
+        if (urlConnection.getResponseCode() > 299) {
             String message = urlConnection.getResponseMessage();
             Log.v(TAG, message);
         }
@@ -54,14 +55,12 @@ public final class NetworkUtility {
             } else {
                 return null;
             }
-        }
-        catch (IOException ex) {
-            Log.e(TAG,Log.getStackTraceString(ex));
-        }
-        finally {
+        } catch (IOException ex) {
+            Log.e(TAG, Log.getStackTraceString(ex));
+        } finally {
             urlConnection.disconnect();
         }
-        return  null;
+        return null;
     }
 
     public static URL buildURL(int numberPage, TypeRequest request, int idMovie) {
@@ -116,12 +115,11 @@ public final class NetworkUtility {
             case MIDDLE:
                 sizeImage = NetworkUtility.MIDDLE_SIZE_IMAGE;
                 break;
-                default:
-                    sizeImage = NetworkUtility.SMALL_SIZE_IMAGE;
+            default:
+                sizeImage = NetworkUtility.SMALL_SIZE_IMAGE;
         }
         return NetworkUtility.IMAGE_HOST + sizeImage + imagePath;
     }
-
 
 
 }

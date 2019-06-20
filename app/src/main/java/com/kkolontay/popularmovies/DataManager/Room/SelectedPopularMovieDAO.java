@@ -1,6 +1,4 @@
 package com.kkolontay.popularmovies.DataManager.Room;
-
-import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -10,10 +8,10 @@ import java.util.List;
 
 @Dao
 public interface SelectedPopularMovieDAO {
-    @Query("SELECT * FROM movieTable ORDER BY mVoteCount")
+    @Query("SELECT * FROM movieTable ORDER BY voteCount")
     List<SelectedPopularMovie> loadAllMovies();
 
-    @Query("SELECT * FROm movieTable WHERE mId = :id LIMIT 1")
+    @Query("SELECT * FROm movieTable WHERE idMovie = :id LIMIT 1")
     SelectedPopularMovie fetchMovie(int id);
 
     @Insert

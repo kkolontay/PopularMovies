@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.kkolontay.popularmovies.DataManager.DataManager;
 import com.kkolontay.popularmovies.DataModel.PopularMovie;
 import com.kkolontay.popularmovies.R;
 import com.kkolontay.popularmovies.Sessions.NetworkUtility;
@@ -54,7 +55,6 @@ public class MainViewRecyclerView extends RecyclerView.Adapter<MainViewRecyclerV
 
     @Override
     public void onBindViewHolder(@NonNull ParentViewHolder popularMovieViewHolder, int i) {
-        Log.i(TAG, String.valueOf(i));
         if (getItemViewType(i) == ITEM) {
             if (popularMovieViewHolder instanceof PopularMovieViewHolder) {
                 PopularMovieViewHolder popularHolder = (PopularMovieViewHolder) popularMovieViewHolder;
@@ -100,6 +100,7 @@ public class MainViewRecyclerView extends RecyclerView.Adapter<MainViewRecyclerV
 
 
     private void add(PopularMovie mc) {
+
         popularMovies.add(mc);
         notifyItemInserted(popularMovies.size() - 1);
     }
@@ -119,7 +120,7 @@ public interface MovieAdapterOnClickHandler {
 
         private ProgressBarViewHolder(@NonNull View itemView) {
             super(itemView);
-            mProgressBar = (ProgressBar) itemView.findViewById(R.id.progressbarViewHolder);
+            mProgressBar =  itemView.findViewById(R.id.progressbarViewHolder);
             mProgressBar.setVisibility(ProgressBar.VISIBLE);
         }
 
@@ -140,7 +141,7 @@ public interface MovieAdapterOnClickHandler {
 
         public PopularMovieViewHolder(@NonNull View itemView) {
             super(itemView);
-            mImageView = (ImageView) itemView.findViewById(R.id.movie_image);
+            mImageView =  itemView.findViewById(R.id.movie_image);
             mImageView.setOnClickListener(this);
         }
 

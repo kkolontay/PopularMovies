@@ -3,13 +3,18 @@ package com.kkolontay.popularmovies.DataManager.Room;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 import com.kkolontay.popularmovies.DataModel.PopularMovie;
 
+import java.sql.Array;
+
+
 @Entity(tableName = "movieTable")
 public class SelectedPopularMovie {
+    @NonNull
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    private long id;
     private int voteCount;
     private int idMovie;
     private boolean video;
@@ -22,7 +27,7 @@ public class SelectedPopularMovie {
     private String overview;
     private String releaseDate;
 
-    public SelectedPopularMovie(int id,
+    public SelectedPopularMovie(long id,
                                 int voteCount,
                                 int idMovie,
                                 boolean video,
@@ -60,6 +65,7 @@ public class SelectedPopularMovie {
                                 String backdropPath,
                                 String overview,
                                 String releaseDate) {
+
         this.voteCount = voteCount;
         this.idMovie = idMovie;
         this.video = video;
@@ -73,11 +79,11 @@ public class SelectedPopularMovie {
         this.releaseDate = releaseDate;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -182,6 +188,8 @@ public class SelectedPopularMovie {
         popularMovie.set_backdrop_path(backdropPath);
         popularMovie.set_overview(overview);
         popularMovie.set_release_date(releaseDate);
+        int[] newgenre = new int[]{1,2};
+        popularMovie.set_genre_ids(newgenre);
         return  popularMovie;
     }
 }

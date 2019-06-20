@@ -14,11 +14,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.kkolontay.popularmovies.ConnectionState;
 import com.kkolontay.popularmovies.DataManager.DataManager;
 import com.kkolontay.popularmovies.DataModel.PopularMovie;
+import com.kkolontay.popularmovies.DataModel.ResponseDataObject;
 import com.kkolontay.popularmovies.R;
 import com.kkolontay.popularmovies.Sessions.TypeRequest;
 import com.kkolontay.popularmovies.View.DetailMovie.DetailMovieActivity;
@@ -31,6 +33,7 @@ import java.util.Arrays;
 
 public final class MainActivity extends AppCompatActivity implements MainActivityInterface, PaginationScrollListener.OnLoadMoreListener, MainViewRecyclerView.MovieAdapterOnClickHandler {
     private static final String SAVEINSTANCE = "POPULAR_MOVIES";
+    private static final String SAVEDTYPEREQYEST = "tepy_request";
     public static final String PUTEXTRAMOVIEDETAIL = "putExtraMovieDetail";
     private ConnectionState downloadingState = ConnectionState.SUCCESS;
     private ArrayList<PopularMovie> popularMovies;
@@ -39,31 +42,54 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
     private MainViewRecyclerView mAdapter;
     private ProgressBar progressBar;
     private PaginationScrollListener paginationScrollListener;
+    private TypeRequest typeRequest = TypeRequest.POPULAR;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.main_recicler_view);
+        RecyclerView recyclerView =  findViewById(R.id.main_recicler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         GridLayoutManager manager = new GridLayoutManager(getBaseContext(), COUNT_COLUMN);
         paginationScrollListener = new PaginationScrollListener(manager, this);
         paginationScrollListener.setLoaded();
         recyclerView.addOnScrollListener(paginationScrollListener);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar =  findViewById(R.id.progressBar);
 
         mAdapter = new MainViewRecyclerView(this, new ArrayList<PopularMovie>());
         recyclerView.setAdapter(mAdapter);
         recyclerView.setLayoutManager(manager);
+        if (viewModel == null) {
+            viewModel = new MainActivityViewModel(this, getApplicationContext());
+            if (savedInstanceState != null) {
+                int state =  savedInstanceState.getInt(SAVEDTYPEREQYEST);
+                switch (state) {
+                    case 0:
+                        viewModel.setTypeRequest(TypeRequest.POPULAR);
+                        typeRequest = TypeRequest.POPULAR;
+                        break;
+                    case 1:
+                        viewModel.setTypeRequest(TypeRequest.RATED);
+                        typeRequest = TypeRequest.RATED;
+                        break;
+                    case 2:
+                        viewModel.setTypeRequest(TypeRequest.SELECTEDMOVIES);
+                        typeRequest = TypeRequest.SELECTEDMOVIES;
+                        break;
+                        default:
+                            break;
+                }
+            }
+        }
        if (savedInstanceState == null) {
-           viewModel = new MainActivityViewModel(this);
+
            provideNextData();
        } else {
             PopularMovie[] savedMovie = (PopularMovie[]) savedInstanceState.getParcelableArray(SAVEINSTANCE);
             if (savedMovie != null) {
-                popularMovies = new ArrayList<PopularMovie>(Arrays.asList(savedMovie));
+                popularMovies = new ArrayList<>(Arrays.asList(savedMovie));
                 mAdapter.setPopularMovies(popularMovies);
             }
        }
@@ -74,6 +100,21 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
         PopularMovie[] savedMovie = new PopularMovie[popularMovies.size()];
         savedMovie = popularMovies.toArray(savedMovie);
         outState.putParcelableArray(SAVEINSTANCE, savedMovie );
+        int state;
+        switch (typeRequest) {
+            case POPULAR:
+                state = 0;
+                break;
+            case RATED:
+                state = 1;
+                break;
+            case SELECTEDMOVIES:
+                state = 2;
+                break;
+                default:
+                    state = 0;
+        }
+        outState.putInt(SAVEDTYPEREQYEST, state);
         super.onSaveInstanceState(outState);
     }
 
@@ -81,6 +122,14 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.type_movie_menu, menu);
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (typeRequest == TypeRequest.SELECTEDMOVIES) {
+            changeTypeMovieRequest(typeRequest);
+        }
     }
 
     @Override
@@ -93,6 +142,9 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
             case R.id.top_rated_movie:
                 changeTypeMovieRequest(TypeRequest.RATED);
                return  true;
+            case R.id.selected_list_movies:
+                changeTypeMovieRequest(TypeRequest.SELECTEDMOVIES);
+                return  true;
                 default:
                     return super.onOptionsItemSelected(item);
 
@@ -109,11 +161,11 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
     }
 
     private void changeTypeMovieRequest(TypeRequest type) {
+        typeRequest = type;
         viewModel.setTypeRequest(type);
         mAdapter.setPopularMovies(new ArrayList<PopularMovie>());
         popularMovies = new ArrayList<>();
-        DataManager.getInstance().get_response().set_page(0);
-        DataManager.getInstance().get_response().setResults(new ArrayList<PopularMovie>());
+        DataManager.getInstance().resetResponse(new ResponseDataObject());
         provideNextData();
     }
 
@@ -123,10 +175,10 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
                 dialog.setContentView(R.layout.alert_dialog);
                 dialog.setTitle("Error Message");
 
-                TextView text = (TextView) dialog.findViewById(R.id.error_message_tv);
+                TextView text =  dialog.findViewById(R.id.error_message_tv);
                 text.setText(errorMessage);
 
-                Button dialogButton = (Button) dialog.findViewById(R.id.alert_dialog_message_bt);
+                Button dialogButton =  dialog.findViewById(R.id.alert_dialog_message_bt);
                 dialogButton.setOnClickListener(new View.OnClickListener() {
 
                     @Override
@@ -175,10 +227,11 @@ public final class MainActivity extends AppCompatActivity implements MainActivit
 
     @Override
     public void onLoadMore() {
-        mAdapter.addNullData();
+
         if (DataManager.getInstance().get_response().get_total_pages() <= DataManager.getInstance().get_response().get_page()){
             paginationScrollListener.addEndOfRequests();
         } else {
+            mAdapter.addNullData();
             provideNextData();
         }
 

@@ -20,6 +20,10 @@ public class DataManager {
         this._response.setResults(response.getResults());
     }
 
+    public void resetResponse( ResponseDataObject responseDataObject) {
+        this._response = responseDataObject;
+    }
+
     private DataManager() {
         _response = new ResponseDataObject();
         _response.setResults(new ArrayList<PopularMovie>());
