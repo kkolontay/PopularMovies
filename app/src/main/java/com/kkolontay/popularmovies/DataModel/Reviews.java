@@ -1,59 +1,70 @@
 package com.kkolontay.popularmovies.DataModel;
 
-import java.util.List;
+import java.util.ArrayList;
+
 
 public class Reviews {
-     private int mId;
-     private int mPage;
-     private List<MovieReview> mResults;
-     private int mTotalPages;
-     private int mTotalResults;
+    public static final String ID = "id";
+    public static final String PAGE = "page";
+    public static final String RESULTS = "results";
+    public static final String TOTALPAGES = "total_pages";
+    public static final String TOTALRESULTS = "total_results";
+     private int id;
+     private int page;
+     private ArrayList<MovieReview> results;
+     private int totalPages;
+     private int totalResults;
 
-    public Reviews(int mId, int mPage, List<MovieReview> mResults, int mTotalPages, int mTotalResults) {
-        this.mId = mId;
-        this.mPage = mPage;
-        this.mResults = mResults;
-        this.mTotalPages = mTotalPages;
-        this.mTotalResults = mTotalResults;
+    public Reviews() {
     }
 
-    public int getmId() {
-        return mId;
+
+    public int getId() {
+        return id;
     }
 
-    public int getmPage() {
-        return mPage;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public List<MovieReview> getmResults() {
-        return mResults;
+    public int getPage() {
+        return page;
     }
 
-    public int getmTotalPages() {
-        return mTotalPages;
+    public void setPage(int page) {
+        this.page = page;
     }
 
-    public int getmTotalResults() {
-        return mTotalResults;
+    public ArrayList<MovieReview> getResults() {
+        return results;
     }
 
-    public void setmId(int mId) {
-        this.mId = mId;
+    public void setResults(ArrayList<MovieReview> results) {
+        this.results = results;
     }
 
-    public void setmPage(int mPage) {
-        this.mPage = mPage;
+    public int getTotalPages() {
+        return totalPages;
     }
 
-    public void setmResults(List<MovieReview> mResults) {
-        this.mResults = mResults;
+    public void setTotalPages(int totalPages) {
+        this.totalPages = totalPages;
     }
 
-    public void setmTotalPages(int mTotalPages) {
-        this.mTotalPages = mTotalPages;
+    public int getTotalResults() {
+        return totalResults;
     }
 
-    public void setmTotalResults(int mTotalResults) {
-        this.mTotalResults = mTotalResults;
+    public void setTotalResults(int totalResults) {
+        this.totalResults = totalResults;
     }
+
+    public Reviews(int id, int page, ArrayList<MovieReview> results, int totalPages, int totalResults) {
+        this.id = id;
+        this.page = page;
+        this.results = results;
+        this.totalPages = totalPages;
+        this.totalResults = totalResults;
+    }
+
 }

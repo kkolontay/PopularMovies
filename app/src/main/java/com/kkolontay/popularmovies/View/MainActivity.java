@@ -14,9 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.Switch;
 import android.widget.TextView;
-
 import com.kkolontay.popularmovies.ConnectionState;
 import com.kkolontay.popularmovies.DataManager.DataManager;
 import com.kkolontay.popularmovies.DataModel.PopularMovie;
@@ -27,7 +25,6 @@ import com.kkolontay.popularmovies.View.DetailMovie.DetailMovieActivity;
 import com.kkolontay.popularmovies.View.Pagination.PaginationScrollListener;
 import com.kkolontay.popularmovies.ViewModel.MainActivityInterface;
 import com.kkolontay.popularmovies.ViewModel.MainActivityViewModel;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 

@@ -1,6 +1,9 @@
 package com.kkolontay.popularmovies.Utility;
+import com.kkolontay.popularmovies.DataModel.MovieReview;
 import com.kkolontay.popularmovies.DataModel.PopularMovie;
 import com.kkolontay.popularmovies.DataModel.ResponseDataObject;
+import com.kkolontay.popularmovies.DataModel.Reviews;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.ArrayList;
@@ -30,6 +33,54 @@ public class ObjectsDataJSONParser {
             return null;
         }
         return responseDataObject;
+    }
+
+    public static Reviews getCustomerMovieReviews(String json) {
+        Reviews reviews = new Reviews();
+        try {
+            JSONObject object = new JSONObject(json);
+            int id = object.getInt(Reviews.ID);
+            reviews.setId(id);
+            int page = object.getInt(Reviews.PAGE);
+            reviews.setPage(page);
+            int totalPages = object.getInt(Reviews.TOTALPAGES);
+            reviews.setTotalPages(totalPages);
+            int totalReviews = object.getInt(Reviews.TOTALRESULTS);
+            reviews.setTotalResults(totalReviews);
+            JSONArray jsonArray = object.getJSONArray(Reviews.RESULTS);
+            if (jsonArray != null) {
+                reviews.setResults(getItemsMovieReview(jsonArray));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return reviews;
+    }
+
+    private static ArrayList<MovieReview> getItemsMovieReview(JSONArray jsonArray) {
+        ArrayList<MovieReview> movieReviews = new ArrayList<>();
+        for(int i = 0; i <jsonArray.length(); i++) {
+            try {
+                MovieReview movieReview = new MovieReview();
+                JSONObject object = jsonArray.getJSONObject(i);
+                String author = object.getString(MovieReview.AUTHOR);
+                movieReview.setAuthor(author);
+                String content = object.getString(MovieReview.CONTENT);
+                movieReview.setContent(content);
+                String id = object.getString(MovieReview.ID);
+                movieReview.setContent(id);
+                String url = object.getString(MovieReview.URL);
+                movieReview.setUrl(url);
+                movieReviews.add(movieReview);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return movieReviews;
+            }
+        }
+        return movieReviews;
     }
 
     public static String getIdVideoTeaser( String json) {

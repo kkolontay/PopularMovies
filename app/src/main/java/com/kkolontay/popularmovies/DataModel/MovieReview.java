@@ -2,48 +2,55 @@ package com.kkolontay.popularmovies.DataModel;
 
 
 public class MovieReview {
-     private String mAuthor;
-     private String mContent;
-     private  String mId;
-     private String mURL;
+    public static final String AUTHOR = "author";
+    public static final String CONTENT = "content";
+    public static final String ID = "id";
+    public static final String URL = "url";
+     private String author;
+     private String content;
+     private  String id;
+     private String url;
 
-    public MovieReview(String mAuthor, String mContent, String mId, String mURL) {
-        this.mAuthor = mAuthor;
-        this.mContent = mContent;
-        this.mId = mId;
-        this.mURL = mURL;
+    public MovieReview() {
     }
 
-    public String getmAuthor() {
-        return mAuthor;
+    public MovieReview(String author, String content, String id, String url) {
+        this.author = author;
+        this.content = content;
+        this.id = id;
+        this.url = url;
     }
 
-    public void setmAuthor(String mAuthor) {
-        this.mAuthor = mAuthor;
+    public String getAuthor() {
+        return author;
     }
 
-    public String getmContent() {
-        return mContent;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
-    public void setmContent(String mContent) {
-        this.mContent = mContent;
+    public String getContent() {
+        return content;
     }
 
-    public String getmId() {
-        return mId;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public void setmId(String mId) {
-        this.mId = mId;
+    public String getId() {
+        return id;
     }
 
-    public String getmURL() {
-        return mURL;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setmURL(String mURL) {
-        this.mURL = mURL;
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }
 
