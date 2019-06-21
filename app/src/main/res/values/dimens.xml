@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="middle_marging">16dp</dimen>
+    <dimen name="small_marging">8dp</dimen>
+    <dimen name="underline">1dp</dimen>
 </resources>

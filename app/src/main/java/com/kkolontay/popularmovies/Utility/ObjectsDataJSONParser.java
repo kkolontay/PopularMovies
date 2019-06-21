@@ -70,7 +70,7 @@ public class ObjectsDataJSONParser {
                 String content = object.getString(MovieReview.CONTENT);
                 movieReview.setContent(content);
                 String id = object.getString(MovieReview.ID);
-                movieReview.setContent(id);
+                movieReview.setId(id);
                 String url = object.getString(MovieReview.URL);
                 movieReview.setUrl(url);
                 movieReviews.add(movieReview);

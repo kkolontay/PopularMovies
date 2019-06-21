@@ -12,4 +12,6 @@
     <string name="play_teaser">Play Teaser</string>
     <string name="reviews">REVIEWS</string>
     <string name="selected_movies">Selected movies</string>
+    <string name="warning">Warning</string>
+    <string name="reviewed_film">This film has not been reviewed yet.</string>
 </resources>

@@ -12,10 +12,10 @@ import android.util.Log;
 
 import com.kkolontay.popularmovies.ConnectionState;
 import com.kkolontay.popularmovies.DataModel.MovieReview;
-import com.kkolontay.popularmovies.DataModel.ResponseDataObject;
 import com.kkolontay.popularmovies.DataModel.Reviews;
 import com.kkolontay.popularmovies.Sessions.NetworkUtility;
 import com.kkolontay.popularmovies.Sessions.RequestMovieError;
+import com.kkolontay.popularmovies.Sessions.TypeRequest;
 import com.kkolontay.popularmovies.Utility.ObjectsDataJSONParser;
 
 import java.net.URL;
@@ -24,11 +24,7 @@ import java.util.ArrayList;
 
 public class MovieReviewsViewModel extends AndroidViewModel {
 
-
-
     private ConnectionState state;
-
-
     private static final String TAG = ConnectionState.class.getSimpleName();
     private MutableLiveData<String> errorMessage;
     private MutableLiveData<Integer> nextPage;
@@ -55,11 +51,18 @@ public class MovieReviewsViewModel extends AndroidViewModel {
         return errorMessage;
     }
 
-    public void fetchNextPage(int pageNumber) {
+    public void fetchNextPage(int pageNumber, int idMovie) {
 
+
+                URL url = NetworkUtility.buildURL(pageNumber, TypeRequest.VIEWS, idMovie);
+
+                if (url != null) {
+                    new FetchMoviesList().execute(url);
+                }
     }
 
-    private class FetchMoviesList extends AsyncTask<URL, Void, String> {
+
+    private  class FetchMoviesList extends AsyncTask<URL, Void, String> {
 
         @Override
         protected String doInBackground(URL... urls) {
@@ -96,10 +99,9 @@ public class MovieReviewsViewModel extends AndroidViewModel {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             if (state == ConnectionState.SUCCESS) {
-                ResponseDataObject responseDataObject = ObjectsDataJSONParser.getResponseDataObject(s);
+                Reviews responseDataObject = ObjectsDataJSONParser.getCustomerMovieReviews(s);
                 if (responseDataObject != null) {
-                    dataManager.set_response(responseDataObject);
-                    delegateMainActivity.get().fetchPopularMovie(responseDataObject.getResults(), ConnectionState.SUCCESS);
+                    fetchReviewMovies(responseDataObject);
                 }
 
             }
@@ -110,5 +112,31 @@ public class MovieReviewsViewModel extends AndroidViewModel {
             super.onPreExecute();
         }
 
+    }
+
+    private void fetchReviewMovies(Reviews newRevieMovies) {
+        if (reviews == null) {
+            reviews = newRevieMovies;
+            reviewsMovie.setValue(newRevieMovies.getResults());
+            if(newRevieMovies.getPage() < newRevieMovies.getTotalPages()) {
+                int next = newRevieMovies.getPage() + 1;
+                nextPage.setValue(next);
+            } else {
+                nextPage.setValue(-1);
+            }
+        } else {
+            reviewsMovie.setValue(newRevieMovies.getResults());
+            if(newRevieMovies.getPage() < newRevieMovies.getTotalPages()) {
+                int next = newRevieMovies.getPage() + 1;
+                nextPage.setValue(next);
+                reviews.setPage(newRevieMovies.getPage());
+                ArrayList<MovieReview> existList = reviews.getResults();
+                existList.addAll(newRevieMovies.getResults());
+                reviews.setResults(existList);
+
+            } else {
+                nextPage.setValue(-1);
+            }
+        }
     }
 }

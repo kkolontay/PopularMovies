@@ -13,6 +13,7 @@ import java.util.Scanner;
 
 public final class NetworkUtility {
 
+    //TODO: place for your api key
     public static final String KEYAPI = "";
 
     private static final String HOST = "https://api.themoviedb.org/3/";
@@ -103,6 +104,7 @@ public final class NetworkUtility {
             }
 
         }
+        Log.v(TAG, url.toString());
         return url;
     }
 
