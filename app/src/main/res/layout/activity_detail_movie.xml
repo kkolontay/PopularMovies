@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <ScrollView
+        android:id="@+id/scrollView2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toTopOf="parent"
@@ -19,58 +19,51 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <android.support.constraint.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:id="@+id/movie_poster"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="fill_horizontal"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="@string/poster_for_movie"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="1.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="1.0">
-
-
-                </ImageView>
-
-                <Button
-                    android:id="@+id/selected_movie_button"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:background="@color/colorAccent"
-                    android:foreground="@drawable/emptystarnewcolor"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-            </android.support.constraint.ConstraintLayout>
-
-            <include layout="@layout/linear_detail_vote"/>
-            <include layout="@layout/linear_detail_description"/>
-            <include layout="@layout/youtube_player"/>
-            <Button
+            <ImageView
+                android:id="@+id/movie_poster"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/all_teasers"
+                android:layout_gravity="fill_horizontal"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/poster_for_movie">
+
+
+            </ImageView>
+
+            <Button
+                android:id="@+id/selected_movie_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/emptystarnewcolor"
+               />
+
+
+            <include layout="@layout/linear_detail_vote" />
+
+            <include layout="@layout/linear_detail_description" />
+
+            <FrameLayout
+                android:id="@+id/youtube_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+
+                android:orientation="vertical" />
+            <!-- <include layout="@layout/youtube_player"/>-->
+            <include layout="@layout/player_buttons" />
+
+            <include layout="@layout/linear_detail_date" />
+
+            <Button
+                android:id="@+id/movie_views_bt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_margin="@dimen/middle_marging"
-                android:textSize="@dimen/bigTextSize"
-                android:id="@+id/review_all_teasers"/>
-            <include layout="@layout/linear_detail_date"/>
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:text="@string/reviews"
-                android:layout_margin="@dimen/middle_marging"
-                android:textSize="@dimen/bigTextSize"
-                android:id="@+id/movie_views_bt"/>
-            <include layout="@layout/linear_detail_date"/>
+                android:textSize="@dimen/bigTextSize" />
+
+            <include layout="@layout/linear_detail_date" />
 
         </LinearLayout>
     </ScrollView>

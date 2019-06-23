@@ -16,4 +16,6 @@
     <string name="reviewed_film">This film has not been reviewed yet.</string>
     <string name="teasers_film">This film has not any teaser.</string>
     <string name="all_teasers">ALL TEASERS</string>
+    <string name="next">NEXT</string>
+    <string name="prev">PREV</string>
 </resources>

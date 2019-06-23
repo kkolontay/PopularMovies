@@ -7,62 +7,53 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.google.android.youtube.player.YouTubeBaseActivity;
-import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
-import com.google.android.youtube.player.YouTubePlayerView;
-import com.kkolontay.popularmovies.ConnectionState;
 import com.kkolontay.popularmovies.DataManager.Room.AppDatabase;
 import com.kkolontay.popularmovies.DataManager.Room.SelectedPopularMovie;
 import com.kkolontay.popularmovies.DataModel.PopularMovie;
 import com.kkolontay.popularmovies.R;
 import com.kkolontay.popularmovies.Sessions.NetworkUtility;
-import com.kkolontay.popularmovies.Sessions.RequestMovieError;
 import com.kkolontay.popularmovies.Sessions.SizeImage;
-import com.kkolontay.popularmovies.Sessions.TypeRequest;
 import com.kkolontay.popularmovies.Utility.AppExecutors;
-import com.kkolontay.popularmovies.Utility.ObjectsDataJSONParser;
 import com.kkolontay.popularmovies.Utility.VideoTeaserItem;
 import com.kkolontay.popularmovies.View.MainActivity;
 import com.kkolontay.popularmovies.View.MovieReviews.MovieReviews;
 import com.kkolontay.popularmovies.ViewModel.TeaserViewModelFactory;
 import com.kkolontay.popularmovies.ViewModel.TeasersViewModel;
 import com.squareup.picasso.Picasso;
-import java.net.URL;
+
 import java.util.ArrayList;
 
 
-public class DetailMovieActivity extends YouTubeBaseActivity {
+public class DetailMovieActivity extends AppCompatActivity {
 
     private PopularMovie movie;
     private static final String TAG = DetailMovieActivity.class.getSimpleName();
     public static final String MOVIEID = "movie_id";
-    private static final String SAVEDINSTANCE = "POPULAR_MOVIE";
-    private static final String MOVIEIDKEY = "moviewIdKey";
     private TextView dateReleaseTextView;
     private TextView plotSynopsisTextView;
     private TextView voteAverageTextView;
     private ImageView moviePosterImageView;
-    private ConnectionState state = ConnectionState.SUCCESS;
-    private YouTubePlayerView youTubePlayerView;
     private String keyTeaserMovie;
-    private YouTubePlayer player;
     private Button movieReviewsButton;
     private Button selectedMovieButton;
     private AppDatabase appDatabase;
     private boolean isMovieSelected;
-    private Button watchAllTeasersButton;
+    private Button playPrevTeaserButton;
+    private Button playNextTeaserButton;
     private ArrayList<VideoTeaserItem> teaserItems;
     private TeasersViewModel viewModel;
     private int teaserSelectedId;
+    private VideoFragment videoFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,19 +63,13 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
         plotSynopsisTextView = findViewById(R.id.plot_movie);
         voteAverageTextView = findViewById(R.id.vote_average);
         moviePosterImageView = findViewById(R.id.movie_poster);
-        youTubePlayerView = findViewById(R.id.youtube_player);
         movieReviewsButton = findViewById(R.id.movie_views_bt);
         selectedMovieButton = findViewById(R.id.selected_movie_button);
-        watchAllTeasersButton = findViewById(R.id.review_all_teasers);
+        playNextTeaserButton = findViewById(R.id.play_next_button);
+        playPrevTeaserButton = findViewById(R.id.play_prev_button);
         if (savedInstanceState == null) {
-                movie = getIntent().getExtras().getParcelable(MainActivity.PUTEXTRAMOVIEDETAIL);
-            URL url = NetworkUtility.buildURL(0, TypeRequest.VIDEO, movie.get_id());
-            if (url != null) {
-                new FetchYoutubeLinkShortVideo().execute(url);
-            }
-        } else {
-            movie = savedInstanceState.getParcelable(SAVEDINSTANCE);
-            keyTeaserMovie = savedInstanceState.getString(MOVIEIDKEY);
+            movie = getIntent().getExtras().getParcelable(MainActivity.PUTEXTRAMOVIEDETAIL);
+
         }
         if (movie != null) {
             setData(movie);
@@ -97,14 +82,7 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
                 startActivity(reviews);
             }
         });
-        watchAllTeasersButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent reviews = new Intent(DetailMovieActivity.this, MovieTeasers.class);
-                reviews.putExtra(MOVIEID, movie.get_id());
-                startActivity(reviews);
-            }
-        });
+
         selectedMovieButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,7 +91,7 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
                     public void run() {
                         isMovieSelected = !isMovieSelected;
                         if (isMovieSelected) {
-                            if ( appDatabase.selectedPopularMovie().fetchMovie(movie.get_id()) == null) {
+                            if (appDatabase.selectedPopularMovie().fetchMovie(movie.get_id()) == null) {
                                 SelectedPopularMovie selectedPopularMovie = fetchEntity();
                                 appDatabase.selectedPopularMovie().insertMovie(selectedPopularMovie);
 
@@ -121,7 +99,7 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
 
                         } else {
                             SelectedPopularMovie selectedPopularMovie = appDatabase.selectedPopularMovie().fetchMovie(movie.get_id());
-                            if ( selectedPopularMovie != null) {
+                            if (selectedPopularMovie != null) {
                                 appDatabase.selectedPopularMovie().deleteMovie(selectedPopularMovie);
                             }
 
@@ -139,13 +117,13 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
 
             }
         });
-       setItemIsSelected();
-       initViewModel();
+        setItemIsSelected();
+        initViewModel();
 
     }
 
     private void initViewModel() {
-        if(isOnline()) {
+        if (isOnline()) {
             viewModel = ViewModelProviders.of(this, new TeaserViewModelFactory(getApplication(), movie.get_id())).get(TeasersViewModel.class);
             final Observer<String> errorMessage = new Observer<String>() {
                 @Override
@@ -159,8 +137,9 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
                 @Override
                 public void onChanged(@Nullable ArrayList<VideoTeaserItem> teasers) {
                     if (teasers.size() > 0) {
-                       // adapter.setTeaserItems(teasers);
-                       // adapter.notifyDataSetChanged();
+                        teaserItems = teasers;
+                        teaserSelectedId = 0;
+                        playTeaserButtonSelected();
                     } else {
                         showWarning();
                     }
@@ -175,10 +154,10 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
         dialog.setContentView(R.layout.alert_dialog);
         dialog.setTitle(getString(R.string.warning));
 
-        TextView text =  dialog.findViewById(R.id.error_message_tv);
+        TextView text = dialog.findViewById(R.id.error_message_tv);
         text.setText(getString(R.string.teasers_film));
 
-        Button dialogButton =  dialog.findViewById(R.id.alert_dialog_message_bt);
+        Button dialogButton = dialog.findViewById(R.id.alert_dialog_message_bt);
         dialogButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -196,10 +175,10 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
         dialog.setContentView(R.layout.alert_dialog);
         dialog.setTitle("Error Message");
 
-        TextView text =  dialog.findViewById(R.id.error_message_tv);
+        TextView text = dialog.findViewById(R.id.error_message_tv);
         text.setText(errorMessage);
 
-        Button dialogButton =  dialog.findViewById(R.id.alert_dialog_message_bt);
+        Button dialogButton = dialog.findViewById(R.id.alert_dialog_message_bt);
         dialogButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -225,7 +204,7 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
         AppExecutors.getInstance().getDiskIO().execute(new Runnable() {
             @Override
             public void run() {
-                if ( appDatabase.selectedPopularMovie().fetchMovie(movie.get_id()) == null) {
+                if (appDatabase.selectedPopularMovie().fetchMovie(movie.get_id()) == null) {
                     isMovieSelected = false;
                 } else {
                     isMovieSelected = true;
@@ -239,20 +218,6 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
             }
         });
 
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(SAVEDINSTANCE, movie);
-        outState.putString(MOVIEIDKEY, keyTeaserMovie);
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        player = null;
-        youTubePlayerView = null;
     }
 
     private SelectedPopularMovie fetchEntity() {
@@ -270,15 +235,40 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
                     movie.get_overview(),
                     movie.get_release_date());
         } else {
-            return  null;
+            return null;
         }
     }
 
     private void setImageToSelectMovieButton() {
-        if(isMovieSelected) {
+        if (isMovieSelected) {
             selectedMovieButton.setBackgroundResource(R.drawable.fillstarnewcolor);
         } else {
             selectedMovieButton.setBackgroundResource(R.drawable.emptystarnewcolor);
+        }
+    }
+
+    private void playTeaserButtonSelected() {
+        makePlayButtonsVisible();
+        keyTeaserMovie = teaserItems.get(teaserSelectedId).getKey();
+        registrationYoutubePlayer();
+    }
+
+    private void makePlayButtonsVisible() {
+        if (teaserItems.size() > 1) {
+            playNextTeaserButton.setVisibility(View.VISIBLE);
+            playPrevTeaserButton.setVisibility(View.VISIBLE);
+            if (teaserSelectedId == 0) {
+                playPrevTeaserButton.setEnabled(false);
+            } else if (teaserSelectedId == teaserItems.size() - 1) {
+                playNextTeaserButton.setEnabled(false);
+            } else {
+                playPrevTeaserButton.setEnabled(true);
+                playNextTeaserButton.setEnabled(true);
+            }
+
+        } else {
+            playNextTeaserButton.setVisibility(View.GONE);
+            playPrevTeaserButton.setVisibility(View.GONE);
         }
     }
 
@@ -294,49 +284,31 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
         } else {
             Picasso.get().load("").placeholder(R.drawable.no_image).error(R.drawable.no_image).into(moviePosterImageView);
         }
-    }
-
-
-    private class FetchYoutubeLinkShortVideo extends AsyncTask<URL, Void, String> {
-
-        @Override
-        protected String doInBackground(URL... urls) {
-            URL url = urls[0];
-            if (url != null) {
-                try {
-                    String result = NetworkUtility.getResponseFromHttpUrl(url);
-                    state = ConnectionState.SUCCESS;
-                    return result;
-
-                } catch (RequestMovieError e) {
-                    String error = ObjectsDataJSONParser.getErrorDescription(e.getMessage());
-                    state = ConnectionState.ERROR;
-                    Log.i(TAG, error);
-
-
-                    return error;
-                } catch (Exception e) {
-                    e.printStackTrace();
+        playNextTeaserButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (teaserSelectedId + 1 < teaserItems.size()) {
+                    teaserSelectedId += 1;
+                    playTeaserButtonSelected();
                 }
             }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            if (state == ConnectionState.SUCCESS) {
-                final String keyTeaser = ObjectsDataJSONParser.getIdVideoTeaser(s);
-                keyTeaserMovie = keyTeaser;
-                registrationYoutubePlayer();
-
+        });
+        playPrevTeaserButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (teaserSelectedId - 1 >= 0) {
+                    teaserSelectedId -= 1;
+                    playTeaserButtonSelected();
+                }
             }
-        }
+        });
     }
+
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        YouTubePlayer player = videoFragment.getPlayer();
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             player.setFullscreenControlFlags(YouTubePlayer.FULLSCREEN_FLAG_CONTROL_SYSTEM_UI);
             player.setFullscreen(true);
@@ -347,56 +319,48 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
     }
 
     private void registrationYoutubePlayer() {
-            if (keyTeaserMovie != null) {
-                youTubePlayerView.initialize(PlayerConfig.YOUTUBE_KEY, new YouTubePlayer.OnInitializedListener() {
+        if (keyTeaserMovie != null) {
+            Log.v(TAG, keyTeaserMovie);
+            videoFragment = VideoFragment.newInstance(keyTeaserMovie);
+            FragmentManager manager = getSupportFragmentManager();
+            manager.beginTransaction().replace(R.id.youtube_fragment, videoFragment).commit();
+            final YouTubePlayer player = videoFragment.getPlayer();
+            if (player != null) {
+
+
+                player.setPlaybackEventListener(new YouTubePlayer.PlaybackEventListener() {
                     @Override
-                    public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
-                        if(!b) {
-                            player = youTubePlayer;
-                            player.setPlaybackEventListener(new YouTubePlayer.PlaybackEventListener() {
-                                @Override
-                                public void onPlaying() {
-                                    if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                                        player.setFullscreen(true);
-                                    }
-                                }
-
-                                @Override
-                                public void onPaused() {
-                                    if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                                        player.setFullscreen(false);
-                                    }
-                                }
-
-                                @Override
-                                public void onStopped() {
-
-                                }
-
-                                @Override
-                                public void onBuffering(boolean b) {
-
-                                }
-
-                                @Override
-                                public void onSeekTo(int i) {
-
-                                }
-                            });
-                            youTubePlayer.cueVideo(keyTeaserMovie);
-                            youTubePlayer.setPlayerStyle(YouTubePlayer.PlayerStyle.DEFAULT);
-                            youTubePlayer.play();
+                    public void onPlaying() {
+                        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                            player.setFullscreen(true);
                         }
                     }
 
-
+                    @Override
+                    public void onPaused() {
+                        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                            player.setFullscreen(false);
+                        }
+                    }
 
                     @Override
-                    public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
+                    public void onStopped() {
+
+                    }
+
+                    @Override
+                    public void onBuffering(boolean b) {
+
+                    }
+
+                    @Override
+                    public void onSeekTo(int i) {
+
                     }
                 });
-            } else {
-                youTubePlayerView.setVisibility(View.GONE);
             }
+
+        }
+
     }
 }

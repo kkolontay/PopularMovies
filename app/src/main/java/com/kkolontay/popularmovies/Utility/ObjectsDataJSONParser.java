@@ -108,7 +108,7 @@ public class ObjectsDataJSONParser {
             ArrayList<VideoTeaserItem> videoTeaserItems = new ArrayList<>();
             for( int i = 0; i < results.length(); i++ ) {
                 VideoTeaserItem item = new VideoTeaserItem();
-                JSONObject objectMovie = results.getJSONObject(0);
+                JSONObject objectMovie = results.getJSONObject(i);
                 if (objectMovie != null) {
                     String key = objectMovie.getString(KEY_TEASER);
                     String name = objectMovie.getString(NAME_TEASER);

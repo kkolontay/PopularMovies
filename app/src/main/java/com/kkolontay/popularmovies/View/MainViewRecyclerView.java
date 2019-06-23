@@ -3,14 +3,11 @@ package com.kkolontay.popularmovies.View;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-
-import com.kkolontay.popularmovies.DataManager.DataManager;
 import com.kkolontay.popularmovies.DataModel.PopularMovie;
 import com.kkolontay.popularmovies.R;
 import com.kkolontay.popularmovies.Sessions.NetworkUtility;
