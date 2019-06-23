@@ -1,12 +1,12 @@
 package com.kkolontay.popularmovies.ViewModel;
-
-import android.content.Context;
+import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.util.Log;
-
-import com.kkolontay.popularmovies.ConnectionState;
 import com.kkolontay.popularmovies.DataManager.DataManager;
 import com.kkolontay.popularmovies.DataManager.Room.AppDatabase;
 import com.kkolontay.popularmovies.DataManager.Room.SelectedPopularMovie;
@@ -17,31 +17,41 @@ import com.kkolontay.popularmovies.Sessions.RequestMovieError;
 import com.kkolontay.popularmovies.Sessions.TypeRequest;
 import com.kkolontay.popularmovies.Utility.AppExecutors;
 import com.kkolontay.popularmovies.Utility.ObjectsDataJSONParser;
-
-import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 
 
-public class MainActivityViewModel {
+public class MainActivityViewModel extends AndroidViewModel {
     private final DataManager dataManager;
-    private final WeakReference<MainActivityInterface> delegateMainActivity;
     private final String TAG = MainActivityViewModel.class.getSimpleName();
-    private ConnectionState state = ConnectionState.SUCCESS;
     private TypeRequest typeRequest = TypeRequest.POPULAR;
+
+    public MutableLiveData<String> getErrorMessage() {
+        return errorMessage;
+    }
+
+    public MutableLiveData<ArrayList<PopularMovie>> getMovies() {
+        return movies;
+    }
+
+    private MutableLiveData<String> errorMessage;
+    private MutableLiveData<ArrayList<PopularMovie>> movies;
     private AppDatabase appDatabase;
+
+    public MainActivityViewModel(@NonNull Application application) {
+        super(application);
+        dataManager = DataManager.getInstance();
+        dataManager.get_response().set_page(0);
+        appDatabase = AppDatabase.getInstance(getApplication().getApplicationContext());
+       errorMessage = new MutableLiveData<>();
+       movies = new MutableLiveData<>();
+       nextPage();
+    }
 
     public void setTypeRequest(TypeRequest typeRequest) {
         this.typeRequest = typeRequest;
-    }
-
-    public MainActivityViewModel(MainActivityInterface delegate, Context context) {
-        this.delegateMainActivity = new WeakReference<>(delegate);
-        dataManager = DataManager.getInstance();
-        dataManager.get_response().set_page(0);
-        appDatabase = AppDatabase.getInstance(context);
     }
 
     private void fetchNextPageMovies() {
@@ -77,7 +87,7 @@ public class MainActivityViewModel {
                         @Override
                         public void run() {
                              DataManager.getInstance().get_response().setResults(popularMovies);
-                            delegateMainActivity.get().fetchPopularMovie(popularMovies, ConnectionState.SUCCESS);
+                            movies.setValue(popularMovies);
                         }
                     };
                     mainHandler.post(myRunnable);
@@ -107,15 +117,19 @@ public class MainActivityViewModel {
             if (url != null) {
                 try {
                     String result = NetworkUtility.getResponseFromHttpUrl(url);
-                    state = ConnectionState.SUCCESS;
                     return result;
 
                 } catch (RequestMovieError e) {
-                    String error = ObjectsDataJSONParser.getErrorDescription(e.getMessage());
-                    state = ConnectionState.ERROR;
+                    final String error = ObjectsDataJSONParser.getErrorDescription(e.getMessage());
                     Log.i(TAG, error);
 
-                    delegateMainActivity.get().errorConnection(error, state);
+                   Handler handler = new Handler(Looper.getMainLooper());
+                   handler.post(new Runnable() {
+                       @Override
+                       public void run() {
+                           errorMessage.setValue(error);
+                       }
+                   });
                     return error;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -128,14 +142,11 @@ public class MainActivityViewModel {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            if (state == ConnectionState.SUCCESS) {
                 ResponseDataObject responseDataObject = ObjectsDataJSONParser.getResponseDataObject(s);
                 if (responseDataObject != null) {
                     dataManager.set_response(responseDataObject);
-                    delegateMainActivity.get().fetchPopularMovie(responseDataObject.getResults(), ConnectionState.SUCCESS);
+                    movies.setValue(responseDataObject.getResults());
                 }
-
-            }
         }
 
         @Override

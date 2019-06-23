@@ -1,9 +1,15 @@
 package com.kkolontay.popularmovies.View.DetailMovie;
 
+import android.app.Dialog;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -24,10 +30,14 @@ import com.kkolontay.popularmovies.Sessions.SizeImage;
 import com.kkolontay.popularmovies.Sessions.TypeRequest;
 import com.kkolontay.popularmovies.Utility.AppExecutors;
 import com.kkolontay.popularmovies.Utility.ObjectsDataJSONParser;
+import com.kkolontay.popularmovies.Utility.VideoTeaserItem;
 import com.kkolontay.popularmovies.View.MainActivity;
 import com.kkolontay.popularmovies.View.MovieReviews.MovieReviews;
+import com.kkolontay.popularmovies.ViewModel.TeaserViewModelFactory;
+import com.kkolontay.popularmovies.ViewModel.TeasersViewModel;
 import com.squareup.picasso.Picasso;
 import java.net.URL;
+import java.util.ArrayList;
 
 
 public class DetailMovieActivity extends YouTubeBaseActivity {
@@ -49,6 +59,10 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
     private Button selectedMovieButton;
     private AppDatabase appDatabase;
     private boolean isMovieSelected;
+    private Button watchAllTeasersButton;
+    private ArrayList<VideoTeaserItem> teaserItems;
+    private TeasersViewModel viewModel;
+    private int teaserSelectedId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +75,7 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
         youTubePlayerView = findViewById(R.id.youtube_player);
         movieReviewsButton = findViewById(R.id.movie_views_bt);
         selectedMovieButton = findViewById(R.id.selected_movie_button);
+        watchAllTeasersButton = findViewById(R.id.review_all_teasers);
         if (savedInstanceState == null) {
                 movie = getIntent().getExtras().getParcelable(MainActivity.PUTEXTRAMOVIEDETAIL);
             URL url = NetworkUtility.buildURL(0, TypeRequest.VIDEO, movie.get_id());
@@ -78,6 +93,14 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
             @Override
             public void onClick(View v) {
                 Intent reviews = new Intent(DetailMovieActivity.this, MovieReviews.class);
+                reviews.putExtra(MOVIEID, movie.get_id());
+                startActivity(reviews);
+            }
+        });
+        watchAllTeasersButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent reviews = new Intent(DetailMovieActivity.this, MovieTeasers.class);
                 reviews.putExtra(MOVIEID, movie.get_id());
                 startActivity(reviews);
             }
@@ -117,7 +140,83 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
             }
         });
        setItemIsSelected();
+       initViewModel();
 
+    }
+
+    private void initViewModel() {
+        if(isOnline()) {
+            viewModel = ViewModelProviders.of(this, new TeaserViewModelFactory(getApplication(), movie.get_id())).get(TeasersViewModel.class);
+            final Observer<String> errorMessage = new Observer<String>() {
+                @Override
+                public void onChanged(@Nullable String s) {
+                    showAlertMassage(s);
+                }
+            };
+            viewModel.getErrorMessage().observe(this, errorMessage);
+
+            final Observer<ArrayList<VideoTeaserItem>> moviesObserver = new Observer<ArrayList<VideoTeaserItem>>() {
+                @Override
+                public void onChanged(@Nullable ArrayList<VideoTeaserItem> teasers) {
+                    if (teasers.size() > 0) {
+                       // adapter.setTeaserItems(teasers);
+                       // adapter.notifyDataSetChanged();
+                    } else {
+                        showWarning();
+                    }
+                }
+            };
+            viewModel.getVideoTeasers().observe(this, moviesObserver);
+        }
+    }
+
+    private void showWarning() {
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.alert_dialog);
+        dialog.setTitle(getString(R.string.warning));
+
+        TextView text =  dialog.findViewById(R.id.error_message_tv);
+        text.setText(getString(R.string.teasers_film));
+
+        Button dialogButton =  dialog.findViewById(R.id.alert_dialog_message_bt);
+        dialogButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                finish();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void showAlertMassage(String errorMessage) {
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.alert_dialog);
+        dialog.setTitle("Error Message");
+
+        TextView text =  dialog.findViewById(R.id.error_message_tv);
+        text.setText(errorMessage);
+
+        Button dialogButton =  dialog.findViewById(R.id.alert_dialog_message_bt);
+        dialogButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null &&
+                cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 
     private void setItemIsSelected() {
@@ -177,9 +276,9 @@ public class DetailMovieActivity extends YouTubeBaseActivity {
 
     private void setImageToSelectMovieButton() {
         if(isMovieSelected) {
-            selectedMovieButton.setBackgroundResource(R.drawable.fullstar);
+            selectedMovieButton.setBackgroundResource(R.drawable.fillstarnewcolor);
         } else {
-            selectedMovieButton.setBackgroundResource(R.drawable.emptystar);
+            selectedMovieButton.setBackgroundResource(R.drawable.emptystarnewcolor);
         }
     }
 

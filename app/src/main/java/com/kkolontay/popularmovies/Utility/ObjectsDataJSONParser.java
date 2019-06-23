@@ -11,7 +11,8 @@ import java.util.ArrayList;
 public class ObjectsDataJSONParser {
     private static final String STATUSMESSAGE = "status_message";
     private  static final String RESULTS = "results";
-    private static final String KEYTEASER = "key";
+    private static final String KEY_TEASER = "key";
+    private static final String NAME_TEASER = "name";
 
     public static ResponseDataObject getResponseDataObject(String json) {
         ResponseDataObject responseDataObject = new ResponseDataObject();
@@ -89,7 +90,7 @@ public class ObjectsDataJSONParser {
             JSONArray results = object.getJSONArray(RESULTS);
             JSONObject objectMovie = results.getJSONObject(0);
             if (objectMovie != null) {
-                return  objectMovie.getString(KEYTEASER);
+                return  objectMovie.getString(KEY_TEASER);
             }
 
 
@@ -98,6 +99,30 @@ public class ObjectsDataJSONParser {
             return  null;
         }
         return  null;
+    }
+
+    public static ArrayList<VideoTeaserItem> getVideoTeasers( String json) {
+        try {
+            JSONObject object = new JSONObject(json);
+            JSONArray results = object.getJSONArray(RESULTS);
+            ArrayList<VideoTeaserItem> videoTeaserItems = new ArrayList<>();
+            for( int i = 0; i < results.length(); i++ ) {
+                VideoTeaserItem item = new VideoTeaserItem();
+                JSONObject objectMovie = results.getJSONObject(0);
+                if (objectMovie != null) {
+                    String key = objectMovie.getString(KEY_TEASER);
+                    String name = objectMovie.getString(NAME_TEASER);
+                    item.setKey(key);
+                    item.setName(name);
+                    videoTeaserItems.add(item);
+                }
+            }
+
+            return videoTeaserItems;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return  null;
+        }
     }
 
     public static String getErrorDescription(String json) {
@@ -170,3 +195,4 @@ public class ObjectsDataJSONParser {
         return movie;
     }
 }
+

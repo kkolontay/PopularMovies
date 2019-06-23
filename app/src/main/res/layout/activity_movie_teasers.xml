@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:name="com.google.android.youtube.player.YouTubePlayerSupportFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/youtube_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/zeroMarging"
+        android:layout_marginTop="@dimen/zeroMarging"
+        android:layout_marginEnd="@dimen/zeroMarging"
+        android:layout_marginBottom="@dimen/zeroMarging" />
+
+</FrameLayout>

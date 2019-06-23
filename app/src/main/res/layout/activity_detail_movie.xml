@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-   <!-- tools:context=".View.DetailMovie.DetailMovieActivity">-->
 
     <ScrollView
         android:layout_width="match_parent"
@@ -48,7 +47,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="8dp"
                     android:background="@color/colorAccent"
-                    android:foreground="@drawable/emptystar"
+                    android:foreground="@drawable/emptystarnewcolor"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
             </android.support.constraint.ConstraintLayout>
@@ -56,6 +55,14 @@
             <include layout="@layout/linear_detail_vote"/>
             <include layout="@layout/linear_detail_description"/>
             <include layout="@layout/youtube_player"/>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/all_teasers"
+                android:layout_margin="@dimen/middle_marging"
+                android:textSize="@dimen/bigTextSize"
+                android:id="@+id/review_all_teasers"/>
+            <include layout="@layout/linear_detail_date"/>
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
