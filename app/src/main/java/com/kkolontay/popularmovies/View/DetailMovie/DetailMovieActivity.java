@@ -67,9 +67,9 @@ public class DetailMovieActivity extends AppCompatActivity {
         selectedMovieButton = findViewById(R.id.selected_movie_button);
         playNextTeaserButton = findViewById(R.id.play_next_button);
         playPrevTeaserButton = findViewById(R.id.play_prev_button);
+        appDatabase = AppDatabase.getInstance(getApplicationContext());
         if (savedInstanceState == null) {
             movie = getIntent().getExtras().getParcelable(MainActivity.PUTEXTRAMOVIEDETAIL);
-
         }
         if (movie != null) {
             setData(movie);
@@ -117,14 +117,13 @@ public class DetailMovieActivity extends AppCompatActivity {
 
             }
         });
-        setItemIsSelected();
         initViewModel();
 
     }
 
     private void initViewModel() {
         if (isOnline()) {
-            viewModel = ViewModelProviders.of(this, new TeaserViewModelFactory(getApplication(), movie.get_id())).get(TeasersViewModel.class);
+            viewModel = ViewModelProviders.of(this, new TeaserViewModelFactory(getApplication(), movie.get_id(), getApplicationContext())).get(TeasersViewModel.class);
             final Observer<String> errorMessage = new Observer<String>() {
                 @Override
                 public void onChanged(@Nullable String s) {
@@ -146,6 +145,15 @@ public class DetailMovieActivity extends AppCompatActivity {
                 }
             };
             viewModel.getVideoTeasers().observe(this, moviesObserver);
+
+            final Observer<Boolean> isSelected = new Observer<Boolean>() {
+                @Override
+                public void onChanged(@Nullable Boolean selected) {
+                    isMovieSelected  = selected;
+                    setImageToSelectMovieButton();
+                }
+            };
+            viewModel.getIsSelected().observe(this, isSelected);
         }
     }
 
@@ -198,27 +206,6 @@ public class DetailMovieActivity extends AppCompatActivity {
                 cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 
-    private void setItemIsSelected() {
-        appDatabase = AppDatabase.getInstance(getApplicationContext());
-
-        AppExecutors.getInstance().getDiskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                if (appDatabase.selectedPopularMovie().fetchMovie(movie.get_id()) == null) {
-                    isMovieSelected = false;
-                } else {
-                    isMovieSelected = true;
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        setImageToSelectMovieButton();
-                    }
-                });
-            }
-        });
-
-    }
 
     private SelectedPopularMovie fetchEntity() {
 
